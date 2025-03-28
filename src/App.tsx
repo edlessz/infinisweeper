@@ -1,7 +1,11 @@
 import "./App.css";
+import Game from "./components/Game/Game";
+import Viewport from "./components/Game/Viewport";
+
+const game = new Game();
 
 function App() {
-  return <h1>Hello, world!</h1>;
+  return <Viewport Game={game} />;
 }
 
 export default App;
