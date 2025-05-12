@@ -5,32 +5,55 @@ import Vector2 from "./Vector2";
 export default class Game {
   public Board: Board;
   public camera: Camera;
-  public size: Vector2 = {
+  public canvas: HTMLCanvasElement | null = null;
+  public readonly size: Vector2 = {
     x: 0,
     y: 0,
   };
+
+  public updateSize(): void {
+    if (!this.canvas) return;
+    const { width, height } = this.canvas.getBoundingClientRect();
+    this.size.x = width;
+    this.size.y = height;
+  }
+
   constructor() {
     this.Board = new Board();
     this.camera = new Camera(32);
   }
-  public update(ctx: CanvasRenderingContext2D): void {
-    const [boundTopLeft, boundBottomRight] = this.camera.getBounds(this.size);
 
+  public update(ctx: CanvasRenderingContext2D): void {
     ctx.scale(this.camera.ppu, this.camera.ppu);
     ctx.translate(-this.camera.position.x, -this.camera.position.y);
 
-    for (let x = Math.floor(boundTopLeft.x); x < boundBottomRight.x; x++) {
-      for (let y = Math.floor(boundTopLeft.y); y < boundBottomRight.y; y++) {
-        const tile = this.Board.getTile([x, y]);
-        ctx.fillStyle = tile.number === -1 ? "#000" : "#fff";
-        ctx.fillRect(x, y, 1, 1);
-      }
-    }
-
-    this.camera.position.x += 0.1;
-    this.camera.position.y += 0.1;
+    this.Board.draw(ctx, this.camera.getBounds(this.size));
   }
-  public setSize(size: Vector2): void {
-    this.size = size;
+
+  public pan = (): void => {
+    const mouseMove = (event: MouseEvent) => {
+      this.camera.position.x -= event.movementX / this.camera.ppu;
+      this.camera.position.y -= event.movementY / this.camera.ppu;
+    };
+    window.addEventListener("mousemove", mouseMove);
+    window.addEventListener(
+      "mouseup",
+      () => {
+        window.removeEventListener("mousemove", mouseMove);
+      },
+      { once: true }
+    );
+  };
+  public zoom = (event: WheelEvent): void => this.camera.increasePpu(1, event);
+
+  public addEventListeners(): void {
+    if (!this.canvas) return;
+    this.canvas.addEventListener("mousedown", this.pan);
+    this.canvas.addEventListener("wheel", this.zoom);
+  }
+  public removeEventListeners(): void {
+    if (!this.canvas) return;
+    this.canvas.removeEventListener("mousedown", this.pan);
+    this.canvas.removeEventListener("wheel", this.zoom);
   }
 }
