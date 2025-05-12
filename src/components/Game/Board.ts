@@ -3,7 +3,7 @@ import Vector2 from "./Vector2";
 type Key = [number, number];
 interface Tile {
   number: number; // -1 for mine
-  hidden: boolean;
+  revealed: boolean;
   flagged: boolean;
 }
 
@@ -19,7 +19,7 @@ const TEXT_COLORS: Record<number, string> = {
 };
 
 export default class Board {
-  public board: Map<string, Tile> = new Map();
+  private board: Map<string, Tile> = new Map();
 
   private static getAddress(position: Key): string {
     return `${position[0]},${position[1]}`;
@@ -31,7 +31,7 @@ export default class Board {
 
     const tile: Tile = {
       number: Math.random() < 0.18 ? -1 : 0,
-      hidden: false,
+      revealed: false,
       flagged: false,
     };
     this.board.set(Board.getAddress(position), tile);
@@ -57,13 +57,13 @@ export default class Board {
     return tile;
   }
 
-  public getTile(position: Key): Tile {
+  private getTile(position: Key): Tile {
     const tile = this.board.get(Board.getAddress(position));
     if (!tile) return this.generate(position);
     return tile;
   }
 
-  public updateTile(position: Key, tile: Partial<Tile>): void {
+  private updateTile(position: Key, tile: Partial<Tile>): void {
     const existingTile = this.getTile(position);
     this.board.set(Board.getAddress(position), { ...existingTile, ...tile });
   }
@@ -71,7 +71,7 @@ export default class Board {
   private getTileColor(position: Key, tile: Tile): string {
     const [x, y] = position;
 
-    if (tile.hidden) return (x + y) % 2 === 0 ? "#AAD650" : "#A2D048";
+    if (!tile.revealed) return (x + y) % 2 === 0 ? "#AAD650" : "#A2D048";
     return (x + y) % 2 === 0 ? "#E4C29E" : "#D7B998";
   }
 
@@ -89,7 +89,7 @@ export default class Board {
         ctx.fillStyle = this.getTileColor([x, y], tile);
         ctx.fillRect(x, y, 1, 1);
 
-        if (!tile.hidden) {
+        if (tile.revealed) {
           ctx.fillStyle = TEXT_COLORS[tile.number] ?? "#000";
           ctx.fillText(tile.number.toString(), x + 0.5, y + 0.5 + 0.05);
         }
@@ -99,5 +99,21 @@ export default class Board {
     const xCount = Math.floor(boundBottomRight.x) - Math.floor(boundTopLeft.x);
     const yCount = Math.floor(boundBottomRight.y) - Math.floor(boundTopLeft.y);
     return xCount * yCount;
+  }
+
+  public attemptReveal(position: Key): void {
+    const tile = this.getTile(position);
+    if (tile.revealed || tile.flagged) return;
+
+    this.updateTile(position, { revealed: true });
+    if (tile.number === 0)
+      setTimeout(() => {
+        for (let x = position[0] - 1; x <= position[0] + 1; x++) {
+          for (let y = position[1] - 1; y <= position[1] + 1; y++) {
+            if (x === position[0] && y === position[1]) continue;
+            this.attemptReveal([x, y]);
+          }
+        }
+      }, 100);
   }
 }

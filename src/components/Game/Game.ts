@@ -31,20 +31,33 @@ export default class Game {
   }
 
   public pan = (): void => {
+    let mouseMoved = false;
     const mouseMove = (event: MouseEvent) => {
       this.camera.position.x -= event.movementX / this.camera.ppu;
       this.camera.position.y -= event.movementY / this.camera.ppu;
+      mouseMoved = true;
     };
     window.addEventListener("mousemove", mouseMove);
     window.addEventListener(
       "mouseup",
-      () => {
+      (mouseUpEvent) => {
         window.removeEventListener("mousemove", mouseMove);
+        if (!mouseMoved) this.mouseClick(mouseUpEvent);
       },
       { once: true }
     );
   };
   public zoom = (event: WheelEvent): void => this.camera.increasePpu(1, event);
+  public mouseClick = (event: MouseEvent): void => {
+    event.preventDefault();
+
+    const mouse = this.camera.toWorldSpace({
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    this.Board.attemptReveal([Math.floor(mouse.x), Math.floor(mouse.y)]);
+  };
 
   public addEventListeners(): void {
     if (!this.canvas) return;
