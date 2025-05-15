@@ -25,12 +25,17 @@ export default class Board {
     return `${position[0]},${position[1]}`;
   }
 
+  private bombChance: number = 0.18;
+  constructor(bombChance?: number) {
+    this.bombChance = bombChance ?? this.bombChance;
+  }
+
   protected generate(position: Key): Tile {
     if (this.board.has(Board.getAddress(position)))
       return this.board.get(Board.getAddress(position))!;
 
     const tile: Tile = {
-      number: Math.random() < 0.18 ? -1 : 0,
+      number: Math.random() < this.bombChance ? -1 : 0,
       revealed: false,
       flagged: false,
     };
@@ -105,7 +110,18 @@ export default class Board {
     const tile = this.getTile(position);
     if (tile.revealed || tile.flagged) return;
 
+    // generate surrounding tiles
+    for (let x = position[0] - 2; x <= position[0] + 2; x++) {
+      for (let y = position[1] - 2; y <= position[1] + 2; y++) {
+        if (x === position[0] && y === position[1]) continue; // skip the current tile
+        this.generate([x, y]);
+      }
+    }
+
+    // reveal tile
     this.updateTile(position, { revealed: true });
+
+    // if tile is 0, reveal surrounding tiles
     if (tile.number === 0)
       setTimeout(() => {
         for (let x = position[0] - 1; x <= position[0] + 1; x++) {
