@@ -1,5 +1,6 @@
 import Board from "./Board";
 import Camera from "./Camera";
+import ImageManager from "./ImageManager";
 import Vector2 from "./Vector2";
 
 export default class Game {
@@ -21,6 +22,11 @@ export default class Game {
   constructor() {
     this.Board = new Board();
     this.camera = new Camera(32);
+
+    ImageManager.loadImages({
+      flag_animation: "flag_animation.png",
+      flag: "flag.png",
+    });
   }
 
   public update(deltaTime: number): void {
@@ -63,17 +69,24 @@ export default class Game {
       y: event.clientY,
     });
 
-    this.Board.attemptReveal([Math.floor(mouse.x), Math.floor(mouse.y)]);
+    if (event.button === 0)
+      this.Board.attemptReveal([Math.floor(mouse.x), Math.floor(mouse.y)]);
+    if (event.button === 2)
+      this.Board.toggleFlag([Math.floor(mouse.x), Math.floor(mouse.y)]);
   };
+  public cancelContextMenu = (event: MouseEvent): void =>
+    event.preventDefault();
 
   public addEventListeners(): void {
     if (!this.canvas) return;
     this.canvas.addEventListener("mousedown", this.pan);
     this.canvas.addEventListener("wheel", this.zoom);
+    this.canvas.addEventListener("contextmenu", this.cancelContextMenu);
   }
   public removeEventListeners(): void {
     if (!this.canvas) return;
     this.canvas.removeEventListener("mousedown", this.pan);
     this.canvas.removeEventListener("wheel", this.zoom);
+    this.canvas.removeEventListener("contextmenu", this.cancelContextMenu);
   }
 }

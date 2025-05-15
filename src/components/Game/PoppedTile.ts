@@ -5,7 +5,8 @@ export default class PoppedTile {
   private angle: number = 0;
   constructor(
     public position: Vector2,
-    public color: string
+    public color: string,
+    public image?: HTMLImageElement
   ) {}
 
   public update(): void {
@@ -16,10 +17,14 @@ export default class PoppedTile {
   }
   public render(ctx: CanvasRenderingContext2D): void {
     ctx.save();
-    ctx.fillStyle = this.color;
     ctx.translate(this.position.x + 0.5, this.position.y + 0.5);
     ctx.rotate(this.angle);
-    ctx.fillRect(-0.5, -0.5, 1, 1);
+    if (this.image) {
+      ctx.drawImage(this.image, -0.5, -0.5, 1, 1);
+    } else {
+      ctx.fillRect(-0.5, -0.5, 1, 1);
+      ctx.fillStyle = this.color;
+    }
     ctx.restore();
   }
 }

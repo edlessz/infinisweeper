@@ -1,3 +1,4 @@
+import ImageManager from "./ImageManager";
 import PoppedTile from "./PoppedTile";
 import PoppedTileManager from "./PoppedTileManager";
 import Vector2 from "./Vector2";
@@ -7,6 +8,7 @@ interface Tile {
   number: number; // -1 for mine
   revealed: boolean;
   flagged: boolean;
+  flaggedAt?: number;
 }
 
 const TEXT_COLORS: Record<number, string> = {
@@ -108,7 +110,14 @@ export default class Board {
         ctx.fillStyle = this.getTileColor([x, y], tile);
         ctx.fillRect(x, y, 1, 1);
 
-        if (tile.revealed) {
+        if (tile.flagged) {
+          const frame = Math.min(
+            Math.floor((performance.now() - (tile.flaggedAt ?? 0)) / 20),
+            9
+          );
+          const image = ImageManager.get("flag_animation");
+          if (image) ctx.drawImage(image, 0, 81 * frame, 81, 81, x, y, 1, 1);
+        } else if (tile.revealed) {
           if (tile.number !== 0) {
             ctx.fillStyle = TEXT_COLORS[tile.number] ?? "#000";
             ctx.fillText(tile.number.toString(), x + 0.5, y + 0.5 + 0.05);
@@ -218,6 +227,25 @@ export default class Board {
           });
         }
       }
+  }
+
+  public toggleFlag(position: Key): void {
+    const tile = this.getTile(position);
+    if (tile.revealed) return;
+
+    this.updateTile(position, {
+      flagged: !tile.flagged,
+      flaggedAt: performance.now(),
+    });
+    if (tile.flagged) {
+      const image = ImageManager.get("flag");
+      const poppedTile = new PoppedTile(
+        { x: position[0], y: position[1] },
+        "#FF0000",
+        image ?? undefined
+      );
+      this.PoppedTileManager.add(poppedTile);
+    }
   }
 
   public processRevealQueue(): void {
