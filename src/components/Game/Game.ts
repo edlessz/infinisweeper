@@ -11,6 +11,11 @@ export interface SavedGame {
   };
 }
 
+export interface GameStats {
+  flags: number;
+  revealed: number;
+}
+
 export default class Game {
   public Board: Board;
   public camera: Camera;
@@ -159,5 +164,12 @@ export default class Game {
     this.canvas.removeEventListener("mousedown", this.pan);
     this.canvas.removeEventListener("wheel", this.wheelZoom);
     this.canvas.removeEventListener("contextmenu", this.cancelContextMenu);
+  }
+
+  public setLabelStateHook(setLabelState: (state: GameStats) => void): void {
+    this.Board.setLabelState = setLabelState;
+  }
+  public getLabelState(): GameStats {
+    return this.Board.getLabelState();
   }
 }

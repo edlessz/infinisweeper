@@ -1,5 +1,5 @@
 import "./Viewport.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Game from "../Game";
 import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 
@@ -9,6 +9,7 @@ interface ViewportProps {
 
 export default function Viewport({ Game }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [labelState, setLabelState] = useState(Game.getLabelState());
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -16,6 +17,7 @@ export default function Viewport({ Game }: ViewportProps) {
 
     Game.canvas = canvas;
     Game.addEventListeners();
+    Game.setLabelStateHook(setLabelState);
 
     const resize = () => {
       const { width, height } = viewport.getBoundingClientRect();
@@ -77,11 +79,11 @@ export default function Viewport({ Game }: ViewportProps) {
         <button className="circleBtn">
           <SaveIcon size={16} onClick={() => saveGame()} />
         </button>
-        <button
-          className="circleBtn"
-          style={{ marginLeft: "auto" }}
-          onClick={() => Game.zoom(1)}
-        >
+        <div style={{ marginLeft: "auto", marginRight: "auto" }}>
+          <span>{labelState.revealed} Revealed</span>
+          <span>{labelState.flags} Flagged</span>
+        </div>
+        <button className="circleBtn" onClick={() => Game.zoom(1)}>
           <ZoomInIcon size={16} />
         </button>
         <button className="circleBtn" onClick={() => Game.zoom(-1)}>

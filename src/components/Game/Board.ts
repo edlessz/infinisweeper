@@ -1,4 +1,5 @@
 import AudioManager from "./AudioManager";
+import { GameStats } from "./Game";
 import ImageManager from "./ImageManager";
 import PoppedTile from "./PoppedTile";
 import PoppedTileManager from "./PoppedTileManager";
@@ -25,6 +26,9 @@ const TEXT_COLORS: Record<number, string> = {
 };
 
 export default class Board {
+  private tilesRevealed: number = 0;
+  private tilesFlagged: number = 0;
+
   private board: Map<string, Tile> = new Map();
   private PoppedTileManager = new PoppedTileManager();
   private revealQueue: {
@@ -56,6 +60,8 @@ export default class Board {
           revealed: address.includes(","),
           flaggedAt: -1000,
         });
+        if (address.includes(",")) this.tilesRevealed++;
+        if (address.includes(".")) this.tilesFlagged++;
       }
     }
   }
@@ -214,7 +220,33 @@ export default class Board {
 
   public attemptReveal(position: Key): void {
     const tile = this.getTile(position);
-    if (tile.revealed || tile.flagged) return;
+    if (tile.flagged) return;
+
+    if (tile.revealed) {
+      // count surrounding flags
+      let flaggedCount = 0;
+      for (let x = position[0] - 1; x <= position[0] + 1; x++) {
+        for (let y = position[1] - 1; y <= position[1] + 1; y++) {
+          if (x === position[0] && y === position[1]) continue;
+          const neighbor = this.getTile([x, y]);
+          if (neighbor.flagged) flaggedCount++;
+        }
+      }
+      if (flaggedCount === tile.number) {
+        // reveal surrounding tiles
+        for (let x = position[0] - 1; x <= position[0] + 1; x++) {
+          for (let y = position[1] - 1; y <= position[1] + 1; y++) {
+            if (x === position[0] && y === position[1]) continue;
+            const neighbor = this.getTile([x, y]);
+            if (!neighbor.revealed && !neighbor.flagged) {
+              this.attemptReveal([x, y]);
+            }
+          }
+        }
+      }
+      this.updateLabels();
+      return;
+    }
 
     // generate surrounding tiles
     for (let x = position[0] - 2; x <= position[0] + 2; x++) {
@@ -231,6 +263,7 @@ export default class Board {
     );
     this.updateTile(position, { revealed: true });
     this.PoppedTileManager.add(poppedTile);
+    this.tilesRevealed++;
 
     const soundNum = Math.max(tile.number, 1);
     if (tile.number >= 0) AudioManager.play(`blip_${soundNum}`);
@@ -252,6 +285,8 @@ export default class Board {
           });
         }
       }
+
+    this.updateLabels();
   }
 
   public toggleFlag(position: Key): void {
@@ -262,6 +297,7 @@ export default class Board {
       flagged: !tile.flagged,
       flaggedAt: performance.now(),
     });
+    this.tilesFlagged += tile.flagged ? -1 : 1;
     AudioManager.play(!tile.flagged ? "flag_down" : "flag_up");
     if (tile.flagged) {
       const image = ImageManager.get("flag");
@@ -272,6 +308,8 @@ export default class Board {
       );
       this.PoppedTileManager.add(poppedTile);
     }
+
+    this.updateLabels();
   }
 
   public getFirstZero(remainder: number): Key | null {
@@ -304,5 +342,16 @@ export default class Board {
 
   public getSeed(): number {
     return this.seed;
+  }
+
+  public setLabelState: ((state: GameStats) => void) | null = null;
+  public updateLabels(): void {
+    if (this.setLabelState) this.setLabelState(this.getLabelState());
+  }
+  public getLabelState(): GameStats {
+    return {
+      flags: this.tilesFlagged,
+      revealed: this.tilesRevealed,
+    };
   }
 }
