@@ -1,3 +1,5 @@
+import PoppedTile from "./PoppedTile";
+import PoppedTileManager from "./PoppedTileManager";
 import Vector2 from "./Vector2";
 
 type Key = [number, number];
@@ -20,6 +22,7 @@ const TEXT_COLORS: Record<number, string> = {
 
 export default class Board {
   private board: Map<string, Tile> = new Map();
+  private PoppedTileManager = new PoppedTileManager();
   private revealQueue: {
     position: Key;
     time: number;
@@ -86,7 +89,12 @@ export default class Board {
     return (x + y) % 2 === 0 ? "#E4C29E" : "#D7B998";
   }
 
-  public draw(
+  public update(): void {
+    this.processRevealQueue();
+    this.PoppedTileManager.update();
+  }
+
+  public render(
     ctx: CanvasRenderingContext2D,
     [boundTopLeft, boundBottomRight]: [Vector2, Vector2]
   ): number {
@@ -166,6 +174,8 @@ export default class Board {
       }
     }
 
+    this.PoppedTileManager.render(ctx);
+
     const xCount = Math.floor(boundBottomRight.x) - Math.floor(boundTopLeft.x);
     const yCount = Math.floor(boundBottomRight.y) - Math.floor(boundTopLeft.y);
     return xCount * yCount;
@@ -184,7 +194,12 @@ export default class Board {
     }
 
     // reveal tile
+    const poppedTile = new PoppedTile(
+      { x: position[0], y: position[1] },
+      this.getTileColor(position, tile)
+    );
     this.updateTile(position, { revealed: true });
+    this.PoppedTileManager.add(poppedTile);
 
     // if tile is 0, reveal surrounding tiles
     if (tile.number === 0)

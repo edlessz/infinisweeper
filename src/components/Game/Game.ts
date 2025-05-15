@@ -25,13 +25,13 @@ export default class Game {
 
   public update(deltaTime: number): void {
     void deltaTime;
-    this.Board.processRevealQueue();
+    this.Board.update();
   }
   public render(ctx: CanvasRenderingContext2D): void {
     ctx.scale(this.camera.ppu, this.camera.ppu);
     ctx.translate(-this.camera.position.x, -this.camera.position.y);
 
-    this.Board.draw(ctx, this.camera.getBounds(this.size));
+    this.Board.render(ctx, this.camera.getBounds(this.size));
   }
 
   public pan = (): void => {
