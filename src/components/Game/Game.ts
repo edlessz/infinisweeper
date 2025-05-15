@@ -10,6 +10,7 @@ export default class Game {
     x: 0,
     y: 0,
   };
+  public gameStarted: boolean = false;
 
   public updateSize(): void {
     if (!this.canvas) return;
@@ -58,18 +59,45 @@ export default class Game {
   public mouseClick = (event: MouseEvent): void => {
     event.preventDefault();
 
-    const mouse = this.camera.toWorldSpace({
+    let mouse = this.camera.toWorldSpace({
       x: event.clientX,
       y: event.clientY,
     });
 
-    if (event.button === 0)
+    if (event.button === 0) {
+      if (!this.gameStarted) this.findFirstClick(mouse);
+      mouse = this.camera.toWorldSpace({
+        x: event.clientX,
+        y: event.clientY,
+      });
       this.Board.attemptReveal([Math.floor(mouse.x), Math.floor(mouse.y)]);
-    if (event.button === 2)
+      this.gameStarted = true;
+    }
+    if (event.button === 2 && this.gameStarted)
       this.Board.toggleFlag([Math.floor(mouse.x), Math.floor(mouse.y)]);
   };
   public cancelContextMenu = (event: MouseEvent): void =>
     event.preventDefault();
+
+  public findFirstClick(mouse: Vector2): void {
+    const firstZero = this.Board.getFirstZero(
+      (Math.floor(mouse.x) + Math.floor(mouse.y)) % 2
+    );
+    if (firstZero) {
+      const tileOffset = {
+        x: mouse.x % 1,
+        y: mouse.y % 1,
+      };
+      // move camera so that mouse is on top of the first zero
+      const offset = {
+        x: firstZero[0] - mouse.x + tileOffset.x,
+        y: firstZero[1] - mouse.y + tileOffset.y,
+      };
+
+      this.camera.position.x += offset.x;
+      this.camera.position.y += offset.y;
+    }
+  }
 
   public addEventListeners(): void {
     if (!this.canvas) return;

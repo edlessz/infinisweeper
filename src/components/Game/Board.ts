@@ -34,6 +34,10 @@ export default class Board {
   private static getAddress(position: Key): string {
     return `${position[0]},${position[1]}`;
   }
+  public static getKey(address: string): Key {
+    const [x, y] = address.split(",").map(Number);
+    return [x, y];
+  }
 
   private bombChance: number = 0.18;
   private borderThickness: number = 0.1;
@@ -251,6 +255,15 @@ export default class Board {
       );
       this.PoppedTileManager.add(poppedTile);
     }
+  }
+
+  public getFirstZero(remainder: number): Key | null {
+    for (const [address, tile] of this.board.entries()) {
+      const [x, y] = Board.getKey(address);
+      if (tile.number === 0 && (x + y) % 2 == remainder && x > 0 && y > 0)
+        return [x, y];
+    }
+    return null;
   }
 
   public processRevealQueue(): void {
