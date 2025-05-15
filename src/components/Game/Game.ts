@@ -1,6 +1,5 @@
 import Board from "./Board";
 import Camera from "./Camera";
-import ImageManager from "./ImageManager";
 import Vector2 from "./Vector2";
 
 export default class Game {
@@ -22,11 +21,6 @@ export default class Game {
   constructor() {
     this.Board = new Board();
     this.camera = new Camera(32);
-
-    ImageManager.loadImages({
-      flag_animation: "flag_animation.png",
-      flag: "flag.png",
-    });
   }
 
   public update(deltaTime: number): void {

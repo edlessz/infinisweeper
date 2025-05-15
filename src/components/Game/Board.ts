@@ -1,3 +1,4 @@
+import AudioManager from "./AudioManager";
 import ImageManager from "./ImageManager";
 import PoppedTile from "./PoppedTile";
 import PoppedTileManager from "./PoppedTileManager";
@@ -210,6 +211,9 @@ export default class Board {
     this.updateTile(position, { revealed: true });
     this.PoppedTileManager.add(poppedTile);
 
+    const soundNum = Math.max(tile.number, 1);
+    if (tile.number >= 0) AudioManager.play(`blip_${soundNum}`);
+
     // if tile is 0, reveal surrounding tiles
     if (tile.number === 0)
       for (let x = position[0] - 1; x <= position[0] + 1; x++) {
@@ -237,6 +241,7 @@ export default class Board {
       flagged: !tile.flagged,
       flaggedAt: performance.now(),
     });
+    AudioManager.play(!tile.flagged ? "flag_down" : "flag_up");
     if (tile.flagged) {
       const image = ImageManager.get("flag");
       const poppedTile = new PoppedTile(
