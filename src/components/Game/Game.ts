@@ -37,9 +37,12 @@ export default class Game {
   public pan = (): void => {
     let mouseMoved = false;
     const mouseMove = (event: MouseEvent) => {
-      this.camera.position.x -= event.movementX / this.camera.ppu;
-      this.camera.position.y -= event.movementY / this.camera.ppu;
-      mouseMoved = true;
+      if (mouseMoved) {
+        this.camera.position.x -= event.movementX / this.camera.ppu;
+        this.camera.position.y -= event.movementY / this.camera.ppu;
+      }
+      if (Math.abs(event.movementX) > 2 || Math.abs(event.movementY) > 2)
+        mouseMoved = true;
     };
     window.addEventListener("mousemove", mouseMove);
     window.addEventListener(

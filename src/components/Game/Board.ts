@@ -30,6 +30,8 @@ export default class Board {
   }
 
   private bombChance: number = 0.18;
+  private borderThickness: number = 0.1;
+
   constructor(bombChance?: number) {
     this.bombChance = bombChance ?? this.bombChance;
   }
@@ -99,8 +101,67 @@ export default class Board {
         ctx.fillRect(x, y, 1, 1);
 
         if (tile.revealed) {
-          ctx.fillStyle = TEXT_COLORS[tile.number] ?? "#000";
-          ctx.fillText(tile.number.toString(), x + 0.5, y + 0.5 + 0.05);
+          if (tile.number !== 0) {
+            ctx.fillStyle = TEXT_COLORS[tile.number] ?? "#000";
+            ctx.fillText(tile.number.toString(), x + 0.5, y + 0.5 + 0.05);
+          }
+
+          // draw borders
+          ctx.fillStyle = "#86AE3A";
+
+          const revealedNeighbors = {
+            left: this.getTile([x - 1, y]).revealed,
+            right: this.getTile([x + 1, y]).revealed,
+            top: this.getTile([x, y - 1]).revealed,
+            bottom: this.getTile([x, y + 1]).revealed,
+            topLeft: this.getTile([x - 1, y - 1]).revealed,
+            topRight: this.getTile([x + 1, y - 1]).revealed,
+            bottomLeft: this.getTile([x - 1, y + 1]).revealed,
+            bottomRight: this.getTile([x + 1, y + 1]).revealed,
+          };
+
+          if (!revealedNeighbors.left)
+            ctx.fillRect(x, y, this.borderThickness, 1);
+          if (!revealedNeighbors.right)
+            ctx.fillRect(
+              x + 1 - this.borderThickness,
+              y,
+              this.borderThickness,
+              1
+            );
+          if (!revealedNeighbors.top)
+            ctx.fillRect(x, y, 1, this.borderThickness);
+          if (!revealedNeighbors.bottom)
+            ctx.fillRect(
+              x,
+              y + 1 - this.borderThickness,
+              1,
+              this.borderThickness
+            );
+
+          if (!revealedNeighbors.topLeft)
+            ctx.fillRect(x, y, this.borderThickness, this.borderThickness);
+          if (!revealedNeighbors.topRight)
+            ctx.fillRect(
+              x + 1 - this.borderThickness,
+              y,
+              this.borderThickness,
+              this.borderThickness
+            );
+          if (!revealedNeighbors.bottomLeft)
+            ctx.fillRect(
+              x,
+              y + 1 - this.borderThickness,
+              this.borderThickness,
+              this.borderThickness
+            );
+          if (!revealedNeighbors.bottomRight)
+            ctx.fillRect(
+              x + 1 - this.borderThickness,
+              y + 1 - this.borderThickness,
+              this.borderThickness,
+              this.borderThickness
+            );
         }
       }
     }
