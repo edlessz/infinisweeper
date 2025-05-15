@@ -4,7 +4,35 @@ body {
   margin: 0;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 #root {
   width: 100vw;
   height: 100vh;
+}
+
+button {
+  background-color: #e4c29e;
+  border: 2px solid #b99e81;
+  font-family: "Roboto";
+  font-weight: bold;
+  transition: 100ms ease-in-out;
+
+  &:not(:disabled) {
+    cursor: pointer;
+    &:hover {
+      background-color: #d4b18a;
+    }
+    &:active {
+      background-color: #b99e81;
+    }
+  }
+
+  &.circleBtn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 100%;
+  }
 }

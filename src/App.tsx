@@ -1,6 +1,6 @@
 import "./App.css";
 import AudioManager from "./components/Game/AudioManager";
-import Game from "./components/Game/Game";
+import Game, { SavedGame } from "./components/Game/Game";
 import ImageManager from "./components/Game/ImageManager";
 import Viewport from "./components/Game/Viewport/Viewport";
 
@@ -22,7 +22,9 @@ AudioManager.loadAudios({
   blip_8: "blip_8.mp3",
 });
 
-const game = new Game();
+const savedGame: SavedGame | undefined =
+  JSON.parse(localStorage.getItem("savedGame") || "null") ?? undefined;
+const game = new Game(savedGame);
 
 function App() {
   return <Viewport Game={game} />;

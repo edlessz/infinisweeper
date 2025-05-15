@@ -3,6 +3,7 @@ import ImageManager from "./ImageManager";
 import PoppedTile from "./PoppedTile";
 import PoppedTileManager from "./PoppedTileManager";
 import Vector2 from "./Vector2";
+import seedrandom from "seedrandom";
 
 type Key = [number, number];
 interface Tile {
@@ -41,17 +42,33 @@ export default class Board {
 
   private bombChance: number = 0.18;
   private borderThickness: number = 0.1;
+  private seed: number;
 
-  constructor(bombChance?: number) {
+  constructor(bombChance?: number, seed?: number, savedBoard?: string[]) {
     this.bombChance = bombChance ?? this.bombChance;
+    this.seed = seed ?? Date.now();
+
+    if (savedBoard) {
+      for (const address of savedBoard) {
+        const [x, y] = Board.getKey(address.replace(".", ","));
+        this.updateTile([x, y], {
+          flagged: address.includes("."),
+          revealed: address.includes(","),
+          flaggedAt: -1000,
+        });
+      }
+    }
   }
 
   protected generate(position: Key): Tile {
     if (this.board.has(Board.getAddress(position)))
       return this.board.get(Board.getAddress(position))!;
 
+    const cellSeed = `${this.seed}-${position[0]}-${position[1]}`;
+    const rng = seedrandom(cellSeed)();
+
     const tile: Tile = {
-      number: Math.random() < this.bombChance ? -1 : 0,
+      number: rng < this.bombChance ? -1 : 0,
       revealed: false,
       flagged: false,
     };
@@ -274,5 +291,18 @@ export default class Board {
     });
 
     this.revealQueue = this.revealQueue.filter((tile) => tile.time > now);
+  }
+
+  public getSaveData(): string[] {
+    const result = [];
+    for (const [address, tile] of this.board.entries()) {
+      if (tile.revealed) result.push(address);
+      else if (tile.flagged) result.push(address.replace(",", "."));
+    }
+    return result;
+  }
+
+  public getSeed(): number {
+    return this.seed;
   }
 }

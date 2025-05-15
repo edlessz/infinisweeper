@@ -2,6 +2,15 @@ import Board from "./Board";
 import Camera from "./Camera";
 import Vector2 from "./Vector2";
 
+export interface SavedGame {
+  seed: number;
+  board: string[];
+  camera: {
+    position: Vector2;
+    ppu: number;
+  };
+}
+
 export default class Game {
   public Board: Board;
   public camera: Camera;
@@ -19,9 +28,25 @@ export default class Game {
     this.size.y = height;
   }
 
-  constructor() {
-    this.Board = new Board();
-    this.camera = new Camera(32);
+  public getSaveData(): SavedGame | null {
+    if (!this.gameStarted) return null;
+    return {
+      board: this.Board.getSaveData(),
+      camera: {
+        position: this.camera.position,
+        ppu: this.camera.ppu,
+      },
+      seed: this.Board.getSeed(),
+    };
+  }
+  constructor(savedGame?: SavedGame) {
+    this.Board = new Board(0.18, savedGame?.seed, savedGame?.board);
+    this.camera = new Camera(savedGame?.camera.ppu ?? 32);
+    this.camera.position = savedGame?.camera.position ?? {
+      x: 0,
+      y: 0,
+    };
+    if (savedGame) this.gameStarted = true;
   }
 
   public update(deltaTime: number): void {
@@ -55,7 +80,31 @@ export default class Game {
       { once: true }
     );
   };
-  public zoom = (event: WheelEvent): void => this.camera.increasePpu(1, event);
+  public wheelZoom = (event: WheelEvent): void => {
+    event.preventDefault();
+    if (!this.canvas) return;
+
+    const rect = this.canvas.getBoundingClientRect();
+    this.camera.zoomInPosition(
+      {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      },
+      event.deltaY < 0 ? 1 : -1
+    );
+  };
+  public zoom = (amt: number): void => {
+    if (!this.canvas) return;
+
+    this.camera.zoomInPosition(
+      {
+        x: this.canvas.width / 2,
+        y: this.canvas.height / 2,
+      },
+      amt
+    );
+  };
+
   public mouseClick = (event: MouseEvent): void => {
     event.preventDefault();
 
@@ -102,13 +151,13 @@ export default class Game {
   public addEventListeners(): void {
     if (!this.canvas) return;
     this.canvas.addEventListener("mousedown", this.pan);
-    this.canvas.addEventListener("wheel", this.zoom);
+    this.canvas.addEventListener("wheel", this.wheelZoom);
     this.canvas.addEventListener("contextmenu", this.cancelContextMenu);
   }
   public removeEventListeners(): void {
     if (!this.canvas) return;
     this.canvas.removeEventListener("mousedown", this.pan);
-    this.canvas.removeEventListener("wheel", this.zoom);
+    this.canvas.removeEventListener("wheel", this.wheelZoom);
     this.canvas.removeEventListener("contextmenu", this.cancelContextMenu);
   }
 }

@@ -1,6 +1,7 @@
 import "./Viewport.css";
 import { useEffect, useRef } from "react";
 import Game from "../Game";
+import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 
 interface ViewportProps {
   Game: Game;
@@ -60,9 +61,33 @@ export default function Viewport({ Game }: ViewportProps) {
     };
   }, [Game]);
 
+  const saveGame = () => {
+    const saveData = Game.getSaveData();
+    if (!saveData) return;
+    localStorage.setItem("savedGame", JSON.stringify(saveData));
+  };
+
   return (
     <div className="Viewport">
       <canvas ref={canvasRef}></canvas>
+      <div className="overlay">
+        <button className="circleBtn" disabled>
+          <Home size={16} />
+        </button>
+        <button className="circleBtn">
+          <SaveIcon size={16} onClick={() => saveGame()} />
+        </button>
+        <button
+          className="circleBtn"
+          style={{ marginLeft: "auto" }}
+          onClick={() => Game.zoom(1)}
+        >
+          <ZoomInIcon size={16} />
+        </button>
+        <button className="circleBtn" onClick={() => Game.zoom(-1)}>
+          <ZoomOutIcon size={16} />
+        </button>
+      </div>
     </div>
   );
 }

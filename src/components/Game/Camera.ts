@@ -30,35 +30,17 @@ export default class Camera {
       y: this.position.y + position.y / this.ppu,
     };
   }
-  public increasePpu(amount: number, event?: WheelEvent): void {
-    if (!event) {
-      this.ppu += amount;
-      this.ppu = Math.max(
-        this.ppuBounds.min,
-        Math.min(this.ppu, this.ppuBounds.max)
-      );
-      return;
-    }
 
-    event.preventDefault();
-    const canvas = event.target as HTMLCanvasElement;
+  public zoomInPosition(position: Vector2, amount: number): void {
+    const worldBefore = this.toWorldSpace(position);
 
-    const rect = canvas.getBoundingClientRect();
-    const mouse = {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    };
-
-    const worldBefore = this.toWorldSpace(mouse);
-
-    const zoomAmount = event.deltaY < 0 ? 1 : -1;
-    this.ppu += zoomAmount * amount;
+    this.ppu += amount;
     this.ppu = Math.max(
       this.ppuBounds.min,
       Math.min(this.ppu, this.ppuBounds.max)
     );
 
-    const worldAfter = this.toWorldSpace(mouse);
+    const worldAfter = this.toWorldSpace(position);
     const dx = worldAfter.x - worldBefore.x;
     const dy = worldAfter.y - worldBefore.y;
     this.position.x -= dx;
