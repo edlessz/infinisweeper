@@ -20,6 +20,10 @@ const TEXT_COLORS: Record<number, string> = {
 
 export default class Board {
   private board: Map<string, Tile> = new Map();
+  private revealQueue: {
+    position: Key;
+    time: number;
+  }[] = [];
 
   private static getAddress(position: Key): string {
     return `${position[0]},${position[1]}`;
@@ -123,13 +127,30 @@ export default class Board {
 
     // if tile is 0, reveal surrounding tiles
     if (tile.number === 0)
-      setTimeout(() => {
-        for (let x = position[0] - 1; x <= position[0] + 1; x++) {
-          for (let y = position[1] - 1; y <= position[1] + 1; y++) {
-            if (x === position[0] && y === position[1]) continue;
-            this.attemptReveal([x, y]);
-          }
+      for (let x = position[0] - 1; x <= position[0] + 1; x++) {
+        for (let y = position[1] - 1; y <= position[1] + 1; y++) {
+          if (x === position[0] && y === position[1]) continue;
+          if (
+            this.revealQueue.some(
+              (item) => item.position[0] === x && item.position[1] === y
+            )
+          )
+            continue;
+          this.revealQueue.push({
+            position: [x, y],
+            time: performance.now() + 100,
+          });
         }
-      }, 100);
+      }
+  }
+
+  public processRevealQueue(): void {
+    const now = performance.now();
+
+    this.revealQueue.forEach((tile) => {
+      if (tile.time <= now) this.attemptReveal(tile.position);
+    });
+
+    this.revealQueue = this.revealQueue.filter((tile) => tile.time > now);
   }
 }

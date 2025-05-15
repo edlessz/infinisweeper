@@ -23,22 +23,35 @@ export default function Viewport({ Game }: ViewportProps) {
 
       Game.updateSize();
     };
-
     window.addEventListener("resize", resize);
     resize();
 
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("Failed to get canvas context.");
 
+    // Main loop
+    const FIXED_TIMESTEP = 1000 / 60; // 60 FPS
+    let accumulator = 0;
+    let lastTime = performance.now();
     let renderId: number;
     const render = () => {
+      const delta = performance.now() - lastTime;
+      lastTime = performance.now();
+      accumulator += delta;
+      while (accumulator >= FIXED_TIMESTEP) {
+        Game.update(FIXED_TIMESTEP / 1000);
+        accumulator -= FIXED_TIMESTEP;
+      }
+
       ctx.resetTransform();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      Game.update(ctx);
+      Game.render(ctx);
+
       renderId = requestAnimationFrame(render);
     };
     renderId = requestAnimationFrame(render);
 
+    // On cleanup
     return () => {
       window.removeEventListener("resize", resize);
       Game.removeEventListeners();

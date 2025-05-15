@@ -23,7 +23,11 @@ export default class Game {
     this.camera = new Camera(32);
   }
 
-  public update(ctx: CanvasRenderingContext2D): void {
+  public update(deltaTime: number): void {
+    void deltaTime;
+    this.Board.processRevealQueue();
+  }
+  public render(ctx: CanvasRenderingContext2D): void {
     ctx.scale(this.camera.ppu, this.camera.ppu);
     ctx.translate(-this.camera.position.x, -this.camera.position.y);
 
