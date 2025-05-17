@@ -6,6 +6,7 @@ body {
 
 * {
   box-sizing: border-box;
+  font-family: "Roboto";
 }
 
 #root {
@@ -16,7 +17,6 @@ body {
 button {
   background-color: #e4c29e;
   border: 2px solid #b99e81;
-  font-family: "Roboto";
   font-weight: bold;
   transition: 100ms ease-in-out;
 

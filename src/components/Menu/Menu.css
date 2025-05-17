@@ -1,0 +1,34 @@
+.Menu {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  h1 img {
+    width: 1.5rem;
+  }
+
+  .buttonContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    button {
+      width: 100%;
+      min-width: 10rem;
+      padding: 0.25rem;
+
+      &:first-child {
+        border-radius: 1rem 1rem 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 1rem 1rem;
+      }
+    }
+  }
+}

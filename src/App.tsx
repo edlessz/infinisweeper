@@ -3,6 +3,8 @@ import AudioManager from "./components/Game/AudioManager";
 import Game, { SavedGame } from "./components/Game/Game";
 import ImageManager from "./components/Game/ImageManager";
 import Viewport from "./components/Game/Viewport/Viewport";
+import Menu from "./components/Menu/Menu";
+import { useView, Views } from "./contexts/useView";
 
 ImageManager.loadImages({
   flag_animation: "flag_animation.png",
@@ -22,12 +24,28 @@ AudioManager.loadAudios({
   blip_8: "blip_8.mp3",
 });
 
-const savedGame: SavedGame | undefined =
-  JSON.parse(localStorage.getItem("savedGame") || "null") ?? undefined;
-const game = new Game(savedGame);
+let game: Game | null = null;
 
-function App() {
-  return <Viewport Game={game} />;
+export default function App() {
+  const { view, setView } = useView();
+
+  const newGame = (): void => {
+    game = new Game();
+    setView(Views.GAME);
+  };
+  const continueGame = (): void => {
+    const savedGame: SavedGame | undefined =
+      JSON.parse(localStorage.getItem("savedGame") || "null") ?? undefined;
+    if (!savedGame) return console.error("No saved game found.");
+    game = new Game(savedGame);
+    setView(Views.GAME);
+  };
+
+  switch (view) {
+    default:
+    case Views.MENU:
+      return <Menu newGame={newGame} continueGame={continueGame} />;
+    case Views.GAME:
+      return game ? <Viewport Game={game} /> : <div>Could not find game.</div>;
+  }
 }
-
-export default App;
