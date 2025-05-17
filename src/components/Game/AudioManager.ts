@@ -11,7 +11,7 @@ export default class AudioManager {
   }
 
   public static async loadAudios(
-    audios: Record<string, string>
+    audios: Record<string, string>,
   ): Promise<void> {
     for (const [name, path] of Object.entries(audios)) {
       const res = await fetch(path);
@@ -24,10 +24,7 @@ export default class AudioManager {
 
   public static play(name: string): void {
     const buffer = this.bufferCache[name];
-    if (!buffer) {
-      console.warn(`Audio "${name}" not loaded.`);
-      return;
-    }
+    if (!buffer) return console.warn(`Audio "${name}" not loaded.`);
 
     const active = this.activeSources[name];
     if (active.size >= this.maxInstancesPerSound) return;

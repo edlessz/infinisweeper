@@ -15,7 +15,7 @@ export default class PoppedTileManager {
 
   public update(): void {
     this.entities = this.entities.filter(
-      (entity) => entity.deathTime > performance.now()
+      (entity) => entity.deathTime > performance.now(),
     );
     this.entities.forEach((entity) => {
       entity.tile.update();
