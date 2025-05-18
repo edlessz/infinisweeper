@@ -18,7 +18,11 @@ const getSourceDictionary = (
     {} as Record<string, string>
   );
 ImageManager.loadImages(
-  getSourceDictionary("images/", ["flag.png", "flag_animation.png"])
+  getSourceDictionary("images/", [
+    "flag.png",
+    "flag_animation.png",
+    "flag_floor.png",
+  ])
 );
 AudioManager.loadAudios(
   getSourceDictionary("audio/", [

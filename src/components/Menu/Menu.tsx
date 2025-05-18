@@ -1,4 +1,5 @@
 import "./Menu.css";
+import MenuBackground from "./MenuBackground/MenuBackground";
 
 interface MenuProps {
   newGame: () => void;
@@ -22,6 +23,7 @@ export default function Menu({ newGame, continueGame }: MenuProps) {
           Continue Game
         </button>
       </div>
+      <MenuBackground />
     </div>
   );
 }
