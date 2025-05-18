@@ -6,23 +6,35 @@ import Viewport from "./components/Game/Viewport/Viewport";
 import Menu from "./components/Menu/Menu";
 import { useView, Views } from "./contexts/useView";
 
-ImageManager.loadImages({
-  flag_animation: "flag_animation.png",
-  flag: "flag.png",
-});
-AudioManager.loadAudios({
-  reveal: "reveal.mp3",
-  flag_down: "flag_down.mp3",
-  flag_up: "flag_up.mp3",
-  blip_1: "blip_1.mp3",
-  blip_2: "blip_2.mp3",
-  blip_3: "blip_3.mp3",
-  blip_4: "blip_4.mp3",
-  blip_5: "blip_5.mp3",
-  blip_6: "blip_6.mp3",
-  blip_7: "blip_7.mp3",
-  blip_8: "blip_8.mp3",
-});
+const getSourceDictionary = (
+  prefix: string,
+  items: string[]
+): Record<string, string> =>
+  items.reduce(
+    (acc, file) => {
+      acc[file.split(".")[0]] = prefix + file;
+      return acc;
+    },
+    {} as Record<string, string>
+  );
+ImageManager.loadImages(
+  getSourceDictionary("images/", ["flag.png", "flag_animation.png"])
+);
+AudioManager.loadAudios(
+  getSourceDictionary("audio/", [
+    "reveal.mp3",
+    "flag_down.mp3",
+    "flag_up.mp3",
+    "blip_1.mp3",
+    "blip_2.mp3",
+    "blip_3.mp3",
+    "blip_4.mp3",
+    "blip_5.mp3",
+    "blip_6.mp3",
+    "blip_7.mp3",
+    "blip_8.mp3",
+  ])
+);
 
 let game: Game | null = null;
 

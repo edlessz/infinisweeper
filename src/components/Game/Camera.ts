@@ -37,7 +37,7 @@ export default class Camera {
     this.ppu += amount;
     this.ppu = Math.max(
       this.ppuBounds.min,
-      Math.min(this.ppu, this.ppuBounds.max),
+      Math.min(this.ppu, this.ppuBounds.max)
     );
 
     const worldAfter = this.toWorldSpace(position);
@@ -45,5 +45,10 @@ export default class Camera {
     const dy = worldAfter.y - worldBefore.y;
     this.position.x -= dx;
     this.position.y -= dy;
+  }
+
+  public shake(shakiness: number): void {
+    this.position.x += (Math.random() - 0.5) * shakiness;
+    this.position.y += (Math.random() - 0.5) * shakiness;
   }
 }

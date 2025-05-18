@@ -126,7 +126,7 @@ export default class Board {
 
   public render(
     ctx: CanvasRenderingContext2D,
-    [boundTopLeft, boundBottomRight]: [Vector2, Vector2],
+    [boundTopLeft, boundBottomRight]: [Vector2, Vector2]
   ): number {
     ctx.font = "0.75px 'Roboto'";
     ctx.textAlign = "center";
@@ -141,7 +141,7 @@ export default class Board {
         if (tile.flagged) {
           const frame = Math.min(
             Math.floor((performance.now() - (tile.flaggedAt ?? 0)) / 20),
-            9,
+            9
           );
           const image = ImageManager.get("flag_animation");
           if (image) ctx.drawImage(image, 0, 81 * frame, 81, 81, x, y, 1, 1);
@@ -172,7 +172,7 @@ export default class Board {
               x + 1 - this.borderThickness,
               y,
               this.borderThickness,
-              1,
+              1
             );
           if (!revealedNeighbors.top)
             ctx.fillRect(x, y, 1, this.borderThickness);
@@ -181,7 +181,7 @@ export default class Board {
               x,
               y + 1 - this.borderThickness,
               1,
-              this.borderThickness,
+              this.borderThickness
             );
 
           if (!revealedNeighbors.topLeft)
@@ -191,21 +191,21 @@ export default class Board {
               x + 1 - this.borderThickness,
               y,
               this.borderThickness,
-              this.borderThickness,
+              this.borderThickness
             );
           if (!revealedNeighbors.bottomLeft)
             ctx.fillRect(
               x,
               y + 1 - this.borderThickness,
               this.borderThickness,
-              this.borderThickness,
+              this.borderThickness
             );
           if (!revealedNeighbors.bottomRight)
             ctx.fillRect(
               x + 1 - this.borderThickness,
               y + 1 - this.borderThickness,
               this.borderThickness,
-              this.borderThickness,
+              this.borderThickness
             );
         }
       }
@@ -259,7 +259,7 @@ export default class Board {
     // reveal tile
     const poppedTile = new PoppedTile(
       { x: position[0], y: position[1] },
-      this.getTileColor(position, tile),
+      this.getTileColor(position, tile)
     );
     this.updateTile(position, { revealed: true });
     this.PoppedTileManager.add(poppedTile);
@@ -275,7 +275,7 @@ export default class Board {
           if (x === position[0] && y === position[1]) continue;
           if (
             this.revealQueue.some(
-              (item) => item.position[0] === x && item.position[1] === y,
+              (item) => item.position[0] === x && item.position[1] === y
             )
           )
             continue;
@@ -304,7 +304,7 @@ export default class Board {
       const poppedTile = new PoppedTile(
         { x: position[0], y: position[1] },
         "#FF0000",
-        image ?? undefined,
+        image ?? undefined
       );
       this.PoppedTileManager.add(poppedTile);
     }
@@ -353,5 +353,9 @@ export default class Board {
       flags: this.tilesFlagged,
       revealed: this.tilesRevealed,
     };
+  }
+
+  public getRevealQueueLength(): number {
+    return this.revealQueue.length;
   }
 }

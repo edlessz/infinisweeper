@@ -11,7 +11,7 @@ export default function Menu({ newGame, continueGame }: MenuProps) {
   return (
     <div className="Menu">
       <h1>
-        Infinisweeper <img src="./flag.png"></img>
+        Infinisweeper <img src="./images/flag.png"></img>
       </h1>
       <div className="buttonContainer">
         <button onClick={newGame}>New Game</button>

@@ -19,5 +19,46 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
+    > div {
+      flex: 1;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+  }
+  .overlay-center {
+    justify-content: center;
+    gap: 1.5rem;
+    font-weight: bold;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      img {
+        width: 1.5rem;
+        height: 1.5rem;
+        aspect-ratio: 1;
+      }
+    }
+  }
+  .overlay-right {
+    justify-content: flex-end;
+  }
+}
+
+.fade-out {
+  animation: fadeOut 2s ease-in-out forwards;
+}
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }

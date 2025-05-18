@@ -57,6 +57,10 @@ export default class Game {
   public update(deltaTime: number): void {
     void deltaTime;
     this.Board.update();
+
+    const revealQueueLength = this.Board.getRevealQueueLength();
+    if (revealQueueLength > 10)
+      this.camera.shake(this.Board.getRevealQueueLength() * 0.01);
   }
   public render(ctx: CanvasRenderingContext2D): void {
     ctx.scale(this.camera.ppu, this.camera.ppu);
@@ -82,7 +86,7 @@ export default class Game {
         window.removeEventListener("mousemove", mouseMove);
         if (!mouseMoved) this.mouseClick(mouseUpEvent);
       },
-      { once: true },
+      { once: true }
     );
   };
   public wheelZoom = (event: WheelEvent): void => {
@@ -95,7 +99,7 @@ export default class Game {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
       },
-      event.deltaY < 0 ? 1 : -1,
+      event.deltaY < 0 ? 1 : -1
     );
   };
   public zoom = (amt: number): void => {
@@ -106,7 +110,7 @@ export default class Game {
         x: this.canvas.width / 2,
         y: this.canvas.height / 2,
       },
-      amt,
+      amt
     );
   };
 
@@ -135,7 +139,7 @@ export default class Game {
 
   public findFirstClick(mouse: Vector2): void {
     const firstZero = this.Board.getFirstZero(
-      (Math.floor(mouse.x) + Math.floor(mouse.y)) % 2,
+      (Math.floor(mouse.x) + Math.floor(mouse.y)) % 2
     );
     if (firstZero) {
       const tileOffset = {

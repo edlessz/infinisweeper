@@ -2,6 +2,7 @@ import "./Viewport.css";
 import { useEffect, useRef, useState } from "react";
 import Game from "../Game";
 import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
+import { useView, Views } from "../../../contexts/useView";
 
 interface ViewportProps {
   Game: Game;
@@ -10,6 +11,8 @@ interface ViewportProps {
 export default function Viewport({ Game }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [labelState, setLabelState] = useState(Game.getLabelState());
+  const [saveText, setSaveText] = useState("");
+  const { setView } = useView();
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -63,32 +66,60 @@ export default function Viewport({ Game }: ViewportProps) {
     };
   }, [Game]);
 
+  const saveTextTimeout = useRef<number | null>(null);
+  const saveTextRef = useRef<HTMLSpanElement>(null);
   const saveGame = () => {
+    setSaveText("Saving...");
     const saveData = Game.getSaveData();
     if (!saveData) return;
     localStorage.setItem("savedGame", JSON.stringify(saveData));
+    setSaveText("Saved!");
+
+    if (saveTextRef.current) {
+      saveTextRef.current.classList.remove("fade-out");
+
+      requestAnimationFrame(() => {
+        void saveTextRef.current?.offsetWidth; // Trigger reflow
+        saveTextRef.current?.classList.add("fade-out");
+      });
+    }
+
+    if (saveTextTimeout.current) clearTimeout(saveTextTimeout.current);
+    saveTextTimeout.current = window.setTimeout(() => {
+      setSaveText("");
+      saveTextTimeout.current = null;
+    }, 2000);
   };
 
   return (
     <div className="Viewport">
       <canvas ref={canvasRef}></canvas>
       <div className="overlay">
-        <button className="circleBtn" disabled>
-          <Home size={16} />
-        </button>
-        <button className="circleBtn">
-          <SaveIcon size={16} onClick={() => saveGame()} />
-        </button>
-        <div style={{ marginLeft: "auto", marginRight: "auto" }}>
-          <span>{labelState.revealed} Revealed</span>
-          <span>{labelState.flags} Flagged</span>
+        <div>
+          <button className="circleBtn" onClick={() => setView(Views.MENU)}>
+            <Home size={16} />
+          </button>
+          <button className="circleBtn" onClick={saveGame}>
+            <SaveIcon size={16} />
+          </button>
+          <span ref={saveTextRef}>{saveText}</span>
         </div>
-        <button className="circleBtn" onClick={() => Game.zoom(1)}>
-          <ZoomInIcon size={16} />
-        </button>
-        <button className="circleBtn" onClick={() => Game.zoom(-1)}>
-          <ZoomOutIcon size={16} />
-        </button>
+        <div className="overlay-center">
+          <span>
+            <img src="./images/shovel.png"></img> {labelState.revealed}
+          </span>
+          <span>
+            <img src="./images/flag.png"></img> {labelState.flags}
+          </span>
+        </div>
+        <div className="overlay-right">
+          <button className="circleBtn" onClick={() => Game.zoom(1)}>
+            <ZoomInIcon size={16} />
+          </button>
+          <button className="circleBtn" onClick={() => Game.zoom(-1)}>
+            <ZoomOutIcon size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );

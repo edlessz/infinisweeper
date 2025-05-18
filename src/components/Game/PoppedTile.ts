@@ -22,8 +22,8 @@ export default class PoppedTile {
     if (this.image) {
       ctx.drawImage(this.image, -0.5, -0.5, 1, 1);
     } else {
-      ctx.fillRect(-0.5, -0.5, 1, 1);
       ctx.fillStyle = this.color;
+      ctx.fillRect(-0.5, -0.5, 1, 1);
     }
     ctx.restore();
   }
