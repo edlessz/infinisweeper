@@ -1,0 +1,36 @@
+.Dialog {
+  position: absolute;
+  left: 50%;
+  top: 0%;
+  transform: translate(-50%, -100%);
+  z-index: 1000;
+
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem;
+  border-radius: 0.5rem;
+
+  h2.Header {
+    margin-top: 0;
+  }
+}
+
+.Dialog.visible {
+  animation: slideIn 250ms ease-in-out forwards;
+}
+.Dialog.hidden {
+  animation: slideIn 250ms ease-in-out reverse forwards;
+}
+.Dialog.hidden-initial {
+  animation: slideIn 0ms ease-in-out reverse forwards;
+}
+
+@keyframes slideIn {
+  from {
+    top: 0%;
+    transform: translate(-50%, -100%);
+  }
+  to {
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}

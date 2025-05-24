@@ -22,6 +22,7 @@ ImageManager.loadImages(
     "flag.png",
     "flag_animation.png",
     "flag_floor.png",
+    "bomb.png",
   ])
 );
 AudioManager.loadAudios(

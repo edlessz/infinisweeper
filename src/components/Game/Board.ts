@@ -10,6 +10,7 @@ type Key = [number, number];
 interface Tile {
   number: number; // -1 for mine
   revealed: boolean;
+  revealedAt?: number;
   flagged: boolean;
   flaggedAt?: number;
 }
@@ -28,6 +29,7 @@ const TEXT_COLORS: Record<number, string> = {
 export default class Board {
   private tilesRevealed: number = 0;
   private tilesFlagged: number = 0;
+  public gameLost: boolean = false;
 
   private board: Map<string, Tile> = new Map();
   private PoppedTileManager = new PoppedTileManager();
@@ -128,7 +130,7 @@ export default class Board {
     ctx: CanvasRenderingContext2D,
     [boundTopLeft, boundBottomRight]: [Vector2, Vector2]
   ): number {
-    ctx.font = "0.75px 'Roboto'";
+    ctx.font = "bold 0.75px 'Roboto'";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -146,9 +148,33 @@ export default class Board {
           const image = ImageManager.get("flag_animation");
           if (image) ctx.drawImage(image, 0, 81 * frame, 81, 81, x, y, 1, 1);
         } else if (tile.revealed) {
-          if (tile.number !== 0) {
+          if (tile.number > 0) {
             ctx.fillStyle = TEXT_COLORS[tile.number] ?? "#000";
             ctx.fillText(tile.number.toString(), x + 0.5, y + 0.5 + 0.05);
+          }
+          if (tile.number === -1) {
+            const image = ImageManager.get("bomb");
+            const revealTime = tile.revealedAt ?? 0;
+            const elapsed = (performance.now() - revealTime) / 1000;
+            const fade = Math.min(elapsed / 0.75, 1);
+
+            if (image) {
+              ctx.drawImage(image, x, y, 1, 1);
+              if (fade > 0) {
+                ctx.save();
+                ctx.globalAlpha = fade;
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(x, y, 1, 1);
+                ctx.restore();
+              }
+            }
+
+            if (fade === 1) {
+              if (!this.gameLost) {
+                console.log(`Explode`);
+              }
+              this.gameLost = true;
+            }
           }
 
           // draw borders
@@ -261,7 +287,10 @@ export default class Board {
       { x: position[0], y: position[1] },
       this.getTileColor(position, tile)
     );
-    this.updateTile(position, { revealed: true });
+    this.updateTile(position, {
+      revealed: true,
+      revealedAt: performance.now(),
+    });
     this.PoppedTileManager.add(poppedTile);
     this.tilesRevealed++;
 
