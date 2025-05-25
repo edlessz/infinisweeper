@@ -1,8 +1,8 @@
 import AudioManager from "./AudioManager";
 import { GameStats } from "./Game";
 import ImageManager from "./ImageManager";
-import PoppedTile from "./PoppedTile";
-import PoppedTileManager from "./PoppedTileManager";
+import Particle from "./Particle";
+import ParticleManager from "./ParticleManager";
 import Vector2 from "./Vector2";
 import seedrandom from "seedrandom";
 
@@ -13,6 +13,7 @@ interface Tile {
   revealedAt?: number;
   flagged: boolean;
   flaggedAt?: number;
+  exploded?: boolean; // for bomb explosion effect
 }
 
 const TEXT_COLORS: Record<number, string> = {
@@ -32,7 +33,7 @@ export default class Board {
   public gameLost: boolean = false;
 
   private board: Map<string, Tile> = new Map();
-  private PoppedTileManager = new PoppedTileManager();
+  private particleManager = new ParticleManager();
   private revealQueue: {
     position: Key;
     time: number;
@@ -123,7 +124,7 @@ export default class Board {
 
   public update(): void {
     this.processRevealQueue();
-    this.PoppedTileManager.update();
+    this.particleManager.update();
   }
 
   public render(
@@ -157,10 +158,11 @@ export default class Board {
             const revealTime = tile.revealedAt ?? 0;
             const elapsed = (performance.now() - revealTime) / 1000;
             const fade = Math.min(elapsed / 0.75, 1);
+            this.gameLost = true;
 
             if (image) {
               ctx.drawImage(image, x, y, 1, 1);
-              if (fade > 0) {
+              if (fade > 0 && fade < 1) {
                 ctx.save();
                 ctx.globalAlpha = fade;
                 ctx.fillStyle = "#fff";
@@ -170,10 +172,11 @@ export default class Board {
             }
 
             if (fade === 1) {
-              if (!this.gameLost) {
-                console.log(`Explode`);
+              if (!tile.exploded) {
+                this.particleManager.explode(x, y);
+                AudioManager.play("confetti");
               }
-              this.gameLost = true;
+              this.updateTile([x, y], { exploded: true });
             }
           }
 
@@ -237,7 +240,7 @@ export default class Board {
       }
     }
 
-    this.PoppedTileManager.render(ctx);
+    this.particleManager.render(ctx);
 
     const xCount = Math.floor(boundBottomRight.x) - Math.floor(boundTopLeft.x);
     const yCount = Math.floor(boundBottomRight.y) - Math.floor(boundTopLeft.y);
@@ -283,7 +286,7 @@ export default class Board {
     }
 
     // reveal tile
-    const poppedTile = new PoppedTile(
+    const poppedTile = new Particle(
       { x: position[0], y: position[1] },
       this.getTileColor(position, tile)
     );
@@ -291,11 +294,12 @@ export default class Board {
       revealed: true,
       revealedAt: performance.now(),
     });
-    this.PoppedTileManager.add(poppedTile);
+    this.particleManager.add(poppedTile);
     this.tilesRevealed++;
 
     const soundNum = Math.max(tile.number, 1);
     if (tile.number >= 0) AudioManager.play(`blip_${soundNum}`);
+    if (tile.number === -1) AudioManager.play("charge");
 
     // if tile is 0, reveal surrounding tiles
     if (tile.number === 0)
@@ -330,12 +334,12 @@ export default class Board {
     AudioManager.play(!tile.flagged ? "flag_down" : "flag_up");
     if (tile.flagged) {
       const image = ImageManager.get("flag");
-      const poppedTile = new PoppedTile(
+      const poppedTile = new Particle(
         { x: position[0], y: position[1] },
         "#FF0000",
         image ?? undefined
       );
-      this.PoppedTileManager.add(poppedTile);
+      this.particleManager.add(poppedTile);
     }
 
     this.updateLabels();

@@ -1,7 +1,8 @@
 import Vector2 from "./Vector2";
 
-export default class PoppedTile {
-  private velocity: Vector2 = { x: (Math.random() * 2 - 1) / 20, y: 0 };
+export default class Particle {
+  public velocity: Vector2 = { x: (Math.random() * 2 - 1) / 20, y: 0 };
+  public size: Vector2 = { x: 1, y: 1 };
   private angle: number = 0;
   constructor(
     public position: Vector2,
@@ -17,13 +18,27 @@ export default class PoppedTile {
   }
   public render(ctx: CanvasRenderingContext2D): void {
     ctx.save();
-    ctx.translate(this.position.x + 0.5, this.position.y + 0.5);
+    ctx.translate(
+      this.position.x + this.size.x / 2,
+      this.position.y + this.size.y / 2
+    );
     ctx.rotate(this.angle);
     if (this.image) {
-      ctx.drawImage(this.image, -0.5, -0.5, 1, 1);
+      ctx.drawImage(
+        this.image,
+        -this.size.x / 2,
+        -this.size.y / 2,
+        this.size.x,
+        this.size.y
+      );
     } else {
       ctx.fillStyle = this.color;
-      ctx.fillRect(-0.5, -0.5, 1, 1);
+      ctx.fillRect(
+        -this.size.x / 2,
+        -this.size.y / 2,
+        this.size.x,
+        this.size.y
+      );
     }
     ctx.restore();
   }

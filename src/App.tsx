@@ -38,6 +38,8 @@ AudioManager.loadAudios(
     "blip_6.mp3",
     "blip_7.mp3",
     "blip_8.mp3",
+    "charge.mp3",
+    "confetti.mp3",
   ])
 );
 

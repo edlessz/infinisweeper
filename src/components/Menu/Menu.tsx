@@ -1,5 +1,3 @@
-import { useState } from "react";
-import Dialog from "../Dialog/Dialog";
 import "./Menu.css";
 import MenuBackground from "./MenuBackground/MenuBackground";
 
@@ -10,8 +8,6 @@ interface MenuProps {
 
 export default function Menu({ newGame, continueGame }: MenuProps) {
   const existingGame: boolean = localStorage.getItem("savedGame") !== null;
-
-  const [visible, setVisible] = useState(false);
 
   return (
     <div className="Menu">
@@ -26,12 +22,8 @@ export default function Menu({ newGame, continueGame }: MenuProps) {
         >
           Continue Game
         </button>
-        <button onClick={() => setVisible(!visible)}>Show</button>
       </div>
       <MenuBackground />
-      <Dialog title="hi" visible={visible}>
-        <div>this is a test</div>
-      </Dialog>
     </div>
   );
 }
