@@ -2,7 +2,7 @@ import Board from "./Board";
 import Camera from "./Camera";
 import Vector2 from "./Vector2";
 
-export interface SavedGame {
+export interface SaveData {
   seed: number;
   board: string[];
   camera: {
@@ -33,19 +33,8 @@ export default class Game {
     this.size.y = height;
   }
 
-  public getSaveData(): SavedGame | null {
-    if (!this.gameStarted) return null;
-    return {
-      board: this.Board.getSaveData(),
-      camera: {
-        position: this.camera.position,
-        ppu: this.camera.ppu,
-      },
-      seed: this.Board.getSeed(),
-    };
-  }
-  constructor(savedGame?: SavedGame) {
-    this.Board = new Board(0.18, savedGame?.seed, savedGame?.board);
+  constructor(savedGame?: SaveData) {
+    this.Board = new Board(this, 0.18, savedGame?.seed, savedGame?.board);
     this.camera = new Camera(savedGame?.camera.ppu ?? 32);
     this.camera.position = savedGame?.camera.position ?? {
       x: 0,
@@ -116,6 +105,7 @@ export default class Game {
 
   public mouseClick = (event: MouseEvent): void => {
     event.preventDefault();
+    if (!this.hooks?.getGameActive()) return;
 
     let mouse = this.camera.toWorldSpace({
       x: event.clientX,
@@ -157,6 +147,17 @@ export default class Game {
     }
   }
 
+  public getSaveData(): SaveData | null {
+    if (!this.gameStarted) return null;
+    return {
+      ...this.Board.getSaveData(),
+      camera: {
+        position: this.camera.position,
+        ppu: this.camera.ppu,
+      },
+    };
+  }
+
   public addEventListeners(): void {
     if (!this.canvas) return;
     this.canvas.addEventListener("mousedown", this.pan);
@@ -170,10 +171,16 @@ export default class Game {
     this.canvas.removeEventListener("contextmenu", this.cancelContextMenu);
   }
 
-  public setLabelStateHook(setLabelState: (state: GameStats) => void): void {
-    this.Board.setLabelState = setLabelState;
+  public hooks: GameHooks | null = null;
+  public setHooks(hooks?: GameHooks): void {
+    this.hooks = hooks ?? null;
+    this.Board.updateStats();
   }
-  public getLabelState(): GameStats {
-    return this.Board.getLabelState();
-  }
+}
+
+interface GameHooks {
+  getStats: () => GameStats;
+  setStats: (stats: GameStats) => void;
+  getGameActive: () => boolean;
+  setGameActive: (active: boolean) => void;
 }

@@ -1,6 +1,6 @@
 import "./App.css";
 import AudioManager from "./components/Game/AudioManager";
-import Game, { SavedGame } from "./components/Game/Game";
+import Game, { SaveData } from "./components/Game/Game";
 import ImageManager from "./components/Game/ImageManager";
 import Viewport from "./components/Game/Viewport/Viewport";
 import Menu from "./components/Menu/Menu";
@@ -53,7 +53,7 @@ export default function App() {
     setView(Views.GAME);
   };
   const continueGame = (): void => {
-    const savedGame: SavedGame | undefined =
+    const savedGame: SaveData | undefined =
       JSON.parse(localStorage.getItem("savedGame") || "null") ?? undefined;
     if (!savedGame) return console.error("No saved game found.");
     game = new Game(savedGame);

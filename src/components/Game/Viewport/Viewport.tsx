@@ -1,6 +1,6 @@
 import "./Viewport.css";
 import { useEffect, useRef, useState } from "react";
-import Game from "../Game";
+import Game, { GameStats } from "../Game";
 import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { useView, Views } from "../../../contexts/useView";
 
@@ -10,9 +10,22 @@ interface ViewportProps {
 
 export default function Viewport({ Game }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [labelState, setLabelState] = useState(Game.getLabelState());
   const [saveText, setSaveText] = useState("");
   const { setView } = useView();
+
+  const [stats, setStats] = useState<GameStats>({
+    flags: 0,
+    revealed: 0,
+  });
+  const statsRef = useRef(stats);
+  useEffect(() => {
+    statsRef.current = stats;
+  }, [stats]);
+  const [gameActive, setGameActive] = useState(true);
+  const gameActiveRef = useRef(gameActive);
+  useEffect(() => {
+    gameActiveRef.current = gameActive;
+  }, [gameActive]);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -20,7 +33,12 @@ export default function Viewport({ Game }: ViewportProps) {
 
     Game.canvas = canvas;
     Game.addEventListeners();
-    Game.setLabelStateHook(setLabelState);
+    Game.setHooks({
+      getGameActive: () => gameActiveRef.current,
+      setGameActive,
+      getStats: () => statsRef.current,
+      setStats,
+    });
 
     const resize = () => {
       const { width, height } = viewport.getBoundingClientRect();
@@ -99,17 +117,21 @@ export default function Viewport({ Game }: ViewportProps) {
           <button className="circleBtn" onClick={() => setView(Views.MENU)}>
             <Home size={16} />
           </button>
-          <button className="circleBtn" onClick={saveGame}>
+          <button
+            className="circleBtn"
+            onClick={() => gameActive && saveGame()}
+            disabled={!gameActive}
+          >
             <SaveIcon size={16} />
           </button>
           <span ref={saveTextRef}>{saveText}</span>
         </div>
         <div className="overlay-center">
           <span>
-            <img src="./images/shovel.png"></img> {labelState.revealed}
+            <img src="./images/shovel.png"></img> {stats.revealed}
           </span>
           <span>
-            <img src="./images/flag.png"></img> {labelState.flags}
+            <img src="./images/flag.png"></img> {stats.flags}
           </span>
         </div>
         <div className="overlay-right">

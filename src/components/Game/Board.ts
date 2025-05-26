@@ -1,5 +1,5 @@
 import AudioManager from "./AudioManager";
-import { GameStats } from "./Game";
+import Game, { GameStats, SaveData } from "./Game";
 import ImageManager from "./ImageManager";
 import Particle from "./Particle";
 import ParticleManager from "./ParticleManager";
@@ -30,7 +30,7 @@ const TEXT_COLORS: Record<number, string> = {
 export default class Board {
   private tilesRevealed: number = 0;
   private tilesFlagged: number = 0;
-  public gameLost: boolean = false;
+  private game: Game;
 
   private board: Map<string, Tile> = new Map();
   private particleManager = new ParticleManager();
@@ -51,9 +51,15 @@ export default class Board {
   private borderThickness: number = 0.1;
   private seed: number;
 
-  constructor(bombChance?: number, seed?: number, savedBoard?: string[]) {
+  constructor(
+    game: Game,
+    bombChance?: number,
+    seed?: number,
+    savedBoard?: string[]
+  ) {
     this.bombChance = bombChance ?? this.bombChance;
     this.seed = seed ?? Date.now();
+    this.game = game;
 
     if (savedBoard) {
       for (const address of savedBoard) {
@@ -66,6 +72,8 @@ export default class Board {
         if (address.includes(",")) this.tilesRevealed++;
         if (address.includes(".")) this.tilesFlagged++;
       }
+
+      this.updateStats();
     }
   }
 
@@ -158,7 +166,6 @@ export default class Board {
             const revealTime = tile.revealedAt ?? 0;
             const elapsed = (performance.now() - revealTime) / 1000;
             const fade = Math.min(elapsed / 0.75, 1);
-            this.gameLost = true;
 
             if (image) {
               ctx.drawImage(image, x, y, 1, 1);
@@ -273,7 +280,7 @@ export default class Board {
           }
         }
       }
-      this.updateLabels();
+      this.updateStats();
       return;
     }
 
@@ -299,7 +306,11 @@ export default class Board {
 
     const soundNum = Math.max(tile.number, 1);
     if (tile.number >= 0) AudioManager.play(`blip_${soundNum}`);
-    if (tile.number === -1) AudioManager.play("charge");
+    if (tile.number === -1) {
+      AudioManager.play("charge");
+      this.game.hooks?.setGameActive(false);
+      localStorage.removeItem("savedGame");
+    }
 
     // if tile is 0, reveal surrounding tiles
     if (tile.number === 0)
@@ -319,7 +330,7 @@ export default class Board {
         }
       }
 
-    this.updateLabels();
+    this.updateStats();
   }
 
   public toggleFlag(position: Key): void {
@@ -342,7 +353,7 @@ export default class Board {
       this.particleManager.add(poppedTile);
     }
 
-    this.updateLabels();
+    this.updateStats();
   }
 
   public getFirstZero(remainder: number): Key | null {
@@ -364,31 +375,32 @@ export default class Board {
     this.revealQueue = this.revealQueue.filter((tile) => tile.time > now);
   }
 
-  public getSaveData(): string[] {
-    const result = [];
-    for (const [address, tile] of this.board.entries()) {
-      if (tile.revealed) result.push(address);
-      else if (tile.flagged) result.push(address.replace(",", "."));
-    }
-    return result;
-  }
-
-  public getSeed(): number {
-    return this.seed;
-  }
-
-  public setLabelState: ((state: GameStats) => void) | null = null;
-  public updateLabels(): void {
-    if (this.setLabelState) this.setLabelState(this.getLabelState());
-  }
-  public getLabelState(): GameStats {
+  public getSaveData(): BoardSaveData {
     return {
-      flags: this.tilesFlagged,
-      revealed: this.tilesRevealed,
+      board: Array.from(this.board.entries()).reduce<string[]>(
+        (acc, [address, tile]) => {
+          if (tile.revealed) acc.push(address);
+          else if (tile.flagged) acc.push(address.replace(",", "."));
+          return acc;
+        },
+        []
+      ),
+      seed: this.seed,
     };
   }
 
   public getRevealQueueLength(): number {
     return this.revealQueue.length;
   }
+
+  public updateStats(): GameStats {
+    const stats: GameStats = {
+      flags: this.tilesFlagged,
+      revealed: this.tilesRevealed,
+    };
+    this.game.hooks?.setStats(stats);
+    return stats;
+  }
 }
+
+type BoardSaveData = Pick<SaveData, "seed" | "board">;
