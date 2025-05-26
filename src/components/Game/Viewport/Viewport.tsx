@@ -3,12 +3,14 @@ import { useEffect, useRef, useState } from "react";
 import Game, { GameStats } from "../Game";
 import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { useView, Views } from "../../../contexts/useView";
+import Dialog from "../../Dialog/Dialog";
 
 interface ViewportProps {
   game: Game;
+  newGame: (() => void) | null;
 }
 
-export default function Viewport({ game }: ViewportProps) {
+export default function Viewport({ game, newGame }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [saveText, setSaveText] = useState("");
   const { setView } = useView();
@@ -26,6 +28,11 @@ export default function Viewport({ game }: ViewportProps) {
   useEffect(() => {
     gameActiveRef.current = gameActive;
   }, [gameActive]);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const dialogVisibleRef = useRef(dialogVisible);
+  useEffect(() => {
+    dialogVisibleRef.current = dialogVisible;
+  }, [dialogVisible]);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -38,7 +45,12 @@ export default function Viewport({ game }: ViewportProps) {
       setGameActive,
       getStats: () => statsRef.current,
       setStats,
+      getDialogVisible: () => dialogVisibleRef.current,
+      setDialogVisible,
     });
+
+    setDialogVisible(false);
+    setGameActive(true);
 
     const resize = () => {
       const { width, height } = viewport.getBoundingClientRect();
@@ -89,9 +101,12 @@ export default function Viewport({ game }: ViewportProps) {
   const saveGame = () => {
     setSaveText("Saving...");
     const saveData = game.getSaveData();
-    if (!saveData) return;
-    localStorage.setItem(Game.savedGameKey, JSON.stringify(saveData));
-    setSaveText("Saved!");
+    if (saveData) {
+      localStorage.setItem(Game.savedGameKey, JSON.stringify(saveData));
+      setSaveText("Saved!");
+    } else {
+      setSaveText("No game to save.");
+    }
 
     if (saveTextRef.current) {
       saveTextRef.current.classList.remove("fade-out");
@@ -143,6 +158,14 @@ export default function Viewport({ game }: ViewportProps) {
           </button>
         </div>
       </div>
+      <Dialog visible={dialogVisible} className="sweeped-dialog">
+        <h1>You've been sweeped!</h1>
+        <span>I'm disappointed.</span>
+        <div className="button-container">
+          {newGame && <button onClick={newGame}>New Game</button>}
+          <button onClick={() => setView(Views.MENU)}>Main Menu</button>
+        </div>
+      </Dialog>
     </div>
   );
 }

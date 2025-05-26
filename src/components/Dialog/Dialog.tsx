@@ -5,9 +5,15 @@ interface DialogProps {
   title?: string;
   children?: React.ReactNode;
   visible?: boolean;
+  className?: string;
 }
 
-export default function Dialog({ title, children, visible }: DialogProps) {
+export default function Dialog({
+  title,
+  children,
+  visible,
+  className,
+}: DialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const visibleToggled = useRef(0);
 
@@ -30,7 +36,7 @@ export default function Dialog({ title, children, visible }: DialogProps) {
   }, [visible]);
 
   return (
-    <div ref={dialogRef} className="Dialog">
+    <div ref={dialogRef} className={"Dialog " + className}>
       {title && <h2 className="Header">{title}</h2>}
       {children}
     </div>

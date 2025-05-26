@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./App.css";
 import AudioManager from "./components/Game/AudioManager";
 import Game, { SaveData } from "./components/Game/Game";
@@ -44,13 +45,12 @@ AudioManager.loadAudios(
   ])
 );
 
-let game: Game | null = null;
-
 export default function App() {
   const { view, setView } = useView();
+  const [game, setGame] = useState<Game | null>(null);
 
   const newGame = (): void => {
-    game = new Game();
+    setGame(new Game());
     setView(Views.GAME);
   };
   const continueGame = (): void => {
@@ -58,7 +58,7 @@ export default function App() {
       JSON.parse(localStorage.getItem(Game.savedGameKey) || "null") ??
       undefined;
     if (!savedGame) return console.error("No saved game found.");
-    game = new Game(savedGame);
+    setGame(new Game(savedGame));
     setView(Views.GAME);
   };
 
@@ -67,6 +67,10 @@ export default function App() {
     case Views.MENU:
       return <Menu newGame={newGame} continueGame={continueGame} />;
     case Views.GAME:
-      return game ? <Viewport game={game} /> : <div>Could not find game.</div>;
+      return game ? (
+        <Viewport game={game} newGame={newGame} />
+      ) : (
+        <div>Could not find game.</div>
+      );
   }
 }

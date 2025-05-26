@@ -21,6 +21,8 @@ interface GameHooks {
   setStats: (stats: GameStats) => void;
   getGameActive: () => boolean;
   setGameActive: (active: boolean) => void;
+  getDialogVisible: () => boolean;
+  setDialogVisible: (visible: boolean) => void;
 }
 
 export default class Game {
@@ -160,6 +162,9 @@ export default class Game {
     this.hooks?.setGameActive(false);
     localStorage.removeItem(Game.savedGameKey);
     this.Board.showIncorrectFlags();
+    setTimeout(() => {
+      this.hooks?.setDialogVisible(true);
+    }, 2500);
   }
 
   public getSaveData(): SaveData | null {

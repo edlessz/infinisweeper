@@ -16,7 +16,7 @@ export default function Menu({ newGame, continueGame }: MenuProps) {
       <h1>
         Infinisweeper <img src="./images/flag.png"></img>
       </h1>
-      <div className="buttonContainer">
+      <div className="button-container">
         <button onClick={newGame}>New Game</button>
         <button
           onClick={() => existingGame && continueGame()}

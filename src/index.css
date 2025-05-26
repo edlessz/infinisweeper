@@ -36,3 +36,25 @@ button {
     border-radius: 100%;
   }
 }
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  button {
+    width: 100%;
+    min-width: 10rem;
+    padding: 0.25rem;
+
+    &:first-child {
+      border-radius: 1rem 1rem 0 0;
+    }
+    &:last-child {
+      border-radius: 0 0 1rem 1rem;
+    }
+    &:only-child {
+      border-radius: 1rem;
+    }
+  }
+}
