@@ -1,4 +1,6 @@
+import ImageManager from "./ImageManager";
 import Particle from "./Particle";
+import Vector2 from "./Vector2";
 
 export default class ParticleManager {
   private entities: {
@@ -47,5 +49,10 @@ export default class ParticleManager {
       };
       this.add(particle);
     }
+  }
+
+  public popFlag(position: Vector2): void {
+    const image = ImageManager.get("flag");
+    this.add(new Particle(position, "#f00", image));
   }
 }

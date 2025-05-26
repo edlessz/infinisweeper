@@ -21,6 +21,12 @@ enum TileState {
   FLAGGED_INCORRECT,
 }
 
+type BoardSaveData = Pick<SaveData, "seed" | "board">;
+enum EventQueueType {
+  REVEAL,
+  INCORRECT_FLAG,
+}
+
 const TEXT_COLORS: Record<number, string> = {
   1: "#1977D3",
   2: "#3B8E3F",
@@ -39,10 +45,6 @@ export default class Board {
 
   private board: Map<string, Tile> = new Map();
   private particleManager = new ParticleManager();
-  private revealQueue: {
-    position: Key;
-    time: number;
-  }[] = [];
 
   private static getAddress(position: Key): string {
     return `${position[0]},${position[1]}`;
@@ -257,6 +259,10 @@ export default class Board {
 
             break;
           }
+          default:
+          case TileState.UNREVEALED: {
+            break;
+          }
           case TileState.FLAGGED: {
             const frame = Math.min(
               Math.floor((performance.now() - tile.interactedAt) / 20),
@@ -264,6 +270,11 @@ export default class Board {
             );
             const image = ImageManager.get("flag_animation");
             if (image) ctx.drawImage(image, 0, 81 * frame, 81, 81, x, y, 1, 1);
+            break;
+          }
+          case TileState.FLAGGED_INCORRECT: {
+            const image = ImageManager.get("flag_incorrect");
+            if (image) ctx.drawImage(image, x, y, 1, 1);
             break;
           }
         }
@@ -316,23 +327,22 @@ export default class Board {
     }
 
     // Reveal the tile, effects
-    const poppedTile = new Particle(
-      { x: position[0], y: position[1] },
-      this.getTileColor(position, tile)
+    this.particleManager.add(
+      new Particle(
+        { x: position[0], y: position[1] },
+        this.getTileColor(position, tile)
+      )
     );
     this.updateTile(position, {
       state: TileState.REVEALED,
       interactedAt: performance.now(),
     });
-    this.particleManager.add(poppedTile);
     this.tilesRevealed++;
-
     const soundNum = Math.max(tile.value, 1);
     if (tile.value >= 0) AudioManager.play(`blip_${soundNum}`);
     if (tile.value === -1) {
       AudioManager.play("charge");
-      this.game.hooks?.setGameActive(false);
-      localStorage.removeItem("savedGame");
+      this.game.loseGame();
     }
 
     // Reveal surrounding tiles if revealed tile is 0
@@ -341,14 +351,15 @@ export default class Board {
         for (let y = position[1] - 1; y <= position[1] + 1; y++) {
           if (x === position[0] && y === position[1]) continue;
           if (
-            this.revealQueue.some(
+            this.eventQueue.some(
               (item) => item.position[0] === x && item.position[1] === y
             )
           )
             continue;
-          this.revealQueue.push({
+          this.eventQueue.push({
             position: [x, y],
             time: performance.now() + 100,
+            type: EventQueueType.REVEAL,
           });
         }
       }
@@ -371,15 +382,8 @@ export default class Board {
     AudioManager.play(
       tile.state === TileState.FLAGGED ? "flag_up" : "flag_down"
     );
-    if (tile.state === TileState.FLAGGED) {
-      const image = ImageManager.get("flag");
-      const poppedTile = new Particle(
-        { x: position[0], y: position[1] },
-        "#FF0000",
-        image
-      );
-      this.particleManager.add(poppedTile);
-    }
+    if (tile.state === TileState.FLAGGED)
+      this.particleManager.popFlag({ x: position[0], y: position[1] });
 
     this.updateStats();
   }
@@ -393,14 +397,34 @@ export default class Board {
     return null;
   }
 
-  public processRevealQueue(): void {
+  private eventQueue: {
+    position: Key;
+    type: EventQueueType;
+    time: number;
+  }[] = [];
+  private processRevealQueue(): void {
     const now = performance.now();
 
-    this.revealQueue.forEach((tile) => {
-      if (tile.time <= now) this.attemptReveal(tile.position);
+    this.eventQueue.forEach((event) => {
+      if (event.time <= now)
+        switch (event.type) {
+          case EventQueueType.REVEAL:
+            this.attemptReveal(event.position);
+            break;
+          case EventQueueType.INCORRECT_FLAG:
+            this.updateTile(event.position, {
+              state: TileState.FLAGGED_INCORRECT,
+            });
+            this.particleManager.popFlag({
+              x: event.position[0],
+              y: event.position[1],
+            });
+            AudioManager.play("flag_up");
+            break;
+        }
     });
 
-    this.revealQueue = this.revealQueue.filter((tile) => tile.time > now);
+    this.eventQueue = this.eventQueue.filter((tile) => tile.time > now);
   }
 
   public getSaveData(): BoardSaveData {
@@ -418,8 +442,24 @@ export default class Board {
     };
   }
 
+  public showIncorrectFlags(): void {
+    let foundInccorectFlags = 0;
+    const startTimeMillis = 1500; // time after game loss
+    this.board.forEach((tile, address) => {
+      if (tile.state === TileState.FLAGGED && tile.value !== -1) {
+        this.eventQueue.push({
+          position: Board.getKey(address),
+          type: EventQueueType.INCORRECT_FLAG,
+          time: performance.now() + startTimeMillis + foundInccorectFlags * 250,
+        });
+        foundInccorectFlags++;
+      }
+    });
+  }
+
   public getRevealQueueLength(): number {
-    return this.revealQueue.length;
+    return this.eventQueue.filter((x) => x.type === EventQueueType.REVEAL)
+      .length;
   }
 
   public updateStats(): GameStats {
@@ -431,5 +471,3 @@ export default class Board {
     return stats;
   }
 }
-
-type BoardSaveData = Pick<SaveData, "seed" | "board">;

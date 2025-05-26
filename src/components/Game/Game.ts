@@ -154,6 +154,12 @@ export default class Game {
     }
   }
 
+  public loseGame(): void {
+    this.hooks?.setGameActive(false);
+    localStorage.removeItem("savedGame");
+    this.Board.showIncorrectFlags();
+  }
+
   public getSaveData(): SaveData | null {
     if (!this.gameStarted) return null;
     return {
