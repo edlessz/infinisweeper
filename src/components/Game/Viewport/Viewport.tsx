@@ -5,10 +5,10 @@ import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { useView, Views } from "../../../contexts/useView";
 
 interface ViewportProps {
-  Game: Game;
+  game: Game;
 }
 
-export default function Viewport({ Game }: ViewportProps) {
+export default function Viewport({ game }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [saveText, setSaveText] = useState("");
   const { setView } = useView();
@@ -31,9 +31,9 @@ export default function Viewport({ Game }: ViewportProps) {
     const canvas = canvasRef.current!;
     const viewport = canvas.parentElement!;
 
-    Game.canvas = canvas;
-    Game.addEventListeners();
-    Game.setHooks({
+    game.canvas = canvas;
+    game.addEventListeners();
+    game.setHooks({
       getGameActive: () => gameActiveRef.current,
       setGameActive,
       getStats: () => statsRef.current,
@@ -45,7 +45,7 @@ export default function Viewport({ Game }: ViewportProps) {
       canvas.width = width;
       canvas.height = height;
 
-      Game.updateSize();
+      game.updateSize();
     };
     window.addEventListener("resize", resize);
     resize();
@@ -63,13 +63,13 @@ export default function Viewport({ Game }: ViewportProps) {
       lastTime = performance.now();
       accumulator += delta;
       while (accumulator >= FIXED_TIMESTEP) {
-        Game.update(FIXED_TIMESTEP / 1000);
+        game.update(FIXED_TIMESTEP / 1000);
         accumulator -= FIXED_TIMESTEP;
       }
 
       ctx.resetTransform();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      Game.render(ctx);
+      game.render(ctx);
 
       renderId = requestAnimationFrame(render);
     };
@@ -78,19 +78,19 @@ export default function Viewport({ Game }: ViewportProps) {
     // On cleanup
     return () => {
       window.removeEventListener("resize", resize);
-      Game.removeEventListeners();
-      Game.canvas = null;
+      game.removeEventListeners();
+      game.canvas = null;
       cancelAnimationFrame(renderId);
     };
-  }, [Game]);
+  }, [game]);
 
   const saveTextTimeout = useRef<number | null>(null);
   const saveTextRef = useRef<HTMLSpanElement>(null);
   const saveGame = () => {
     setSaveText("Saving...");
-    const saveData = Game.getSaveData();
+    const saveData = game.getSaveData();
     if (!saveData) return;
-    localStorage.setItem("savedGame", JSON.stringify(saveData));
+    localStorage.setItem(Game.savedGameKey, JSON.stringify(saveData));
     setSaveText("Saved!");
 
     if (saveTextRef.current) {
@@ -135,10 +135,10 @@ export default function Viewport({ Game }: ViewportProps) {
           </span>
         </div>
         <div className="overlay-right">
-          <button className="circleBtn" onClick={() => Game.zoom(1)}>
+          <button className="circleBtn" onClick={() => game.zoom(1)}>
             <ZoomInIcon size={16} />
           </button>
-          <button className="circleBtn" onClick={() => Game.zoom(-1)}>
+          <button className="circleBtn" onClick={() => game.zoom(-1)}>
             <ZoomOutIcon size={16} />
           </button>
         </div>

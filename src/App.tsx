@@ -55,7 +55,8 @@ export default function App() {
   };
   const continueGame = (): void => {
     const savedGame: SaveData | undefined =
-      JSON.parse(localStorage.getItem("savedGame") || "null") ?? undefined;
+      JSON.parse(localStorage.getItem(Game.savedGameKey) || "null") ??
+      undefined;
     if (!savedGame) return console.error("No saved game found.");
     game = new Game(savedGame);
     setView(Views.GAME);
@@ -66,6 +67,6 @@ export default function App() {
     case Views.MENU:
       return <Menu newGame={newGame} continueGame={continueGame} />;
     case Views.GAME:
-      return game ? <Viewport Game={game} /> : <div>Could not find game.</div>;
+      return game ? <Viewport game={game} /> : <div>Could not find game.</div>;
   }
 }

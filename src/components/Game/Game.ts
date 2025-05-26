@@ -33,6 +33,8 @@ export default class Game {
   };
   public gameStarted: boolean = false;
 
+  public static savedGameKey = "infinisweeper.saved-game";
+
   public updateSize(): void {
     if (!this.canvas) return;
     const { width, height } = this.canvas.getBoundingClientRect();
@@ -156,7 +158,7 @@ export default class Game {
 
   public loseGame(): void {
     this.hooks?.setGameActive(false);
-    localStorage.removeItem("savedGame");
+    localStorage.removeItem(Game.savedGameKey);
     this.Board.showIncorrectFlags();
   }
 

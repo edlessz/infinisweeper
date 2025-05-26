@@ -1,3 +1,4 @@
+import Game from "../Game/Game";
 import "./Menu.css";
 import MenuBackground from "./MenuBackground/MenuBackground";
 
@@ -7,7 +8,8 @@ interface MenuProps {
 }
 
 export default function Menu({ newGame, continueGame }: MenuProps) {
-  const existingGame: boolean = localStorage.getItem("savedGame") !== null;
+  const existingGame: boolean =
+    localStorage.getItem(Game.savedGameKey) !== null;
 
   return (
     <div className="Menu">
