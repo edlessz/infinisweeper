@@ -21,6 +21,7 @@ ImageManager.loadImages(
   getSourceDictionary("images/", [
     "flag.png",
     "flag_animation.png",
+    "flag_incorrect.png",
     "flag_floor.png",
     "bomb.png",
   ])

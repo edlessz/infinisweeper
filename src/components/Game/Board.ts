@@ -8,12 +8,17 @@ import seedrandom from "seedrandom";
 
 type Key = [number, number];
 interface Tile {
-  number: number; // -1 for mine
-  revealed: boolean;
-  revealedAt?: number;
-  flagged: boolean;
-  flaggedAt?: number;
-  exploded?: boolean; // for bomb explosion effect
+  value: number; // -1 for mine
+  state: TileState;
+  interactedAt: number;
+  exploded: boolean; // for bomb explosion effect
+}
+
+enum TileState {
+  REVEALED,
+  UNREVEALED,
+  FLAGGED,
+  FLAGGED_INCORRECT,
 }
 
 const TEXT_COLORS: Record<number, string> = {
@@ -64,13 +69,19 @@ export default class Board {
     if (savedBoard) {
       for (const address of savedBoard) {
         const [x, y] = Board.getKey(address.replace(".", ","));
+        let state = TileState.UNREVEALED;
+        if (address.includes(",")) {
+          state = TileState.REVEALED;
+          this.tilesRevealed++;
+        }
+        if (address.includes(".")) {
+          state = TileState.FLAGGED;
+          this.tilesFlagged++;
+        }
         this.updateTile([x, y], {
-          flagged: address.includes("."),
-          revealed: address.includes(","),
-          flaggedAt: -1000,
+          state,
+          interactedAt: -1000,
         });
-        if (address.includes(",")) this.tilesRevealed++;
-        if (address.includes(".")) this.tilesFlagged++;
       }
 
       this.updateStats();
@@ -85,9 +96,10 @@ export default class Board {
     const rng = seedrandom(cellSeed)();
 
     const tile: Tile = {
-      number: rng < this.bombChance ? -1 : 0,
-      revealed: false,
-      flagged: false,
+      value: rng < this.bombChance ? -1 : 0,
+      state: TileState.UNREVEALED,
+      interactedAt: -1000,
+      exploded: false,
     };
     this.board.set(Board.getAddress(position), tile);
 
@@ -100,12 +112,12 @@ export default class Board {
 
         // if tile is bomb, update the surrounding tiles
         // if tile is empty, count surrounding bombs
-        if (tile.number === -1) {
-          if (!neighbor || neighbor.number === -1) continue;
+        if (tile.value === -1) {
+          if (!neighbor || neighbor.value === -1) continue;
           this.updateTile([xx, yy], {
-            number: neighbor.number + 1,
+            value: neighbor.value + 1,
           });
-        } else if (neighbor?.number === -1) tile.number++;
+        } else if (neighbor?.value === -1) tile.value++;
       }
     }
 
@@ -126,7 +138,8 @@ export default class Board {
   private getTileColor(position: Key, tile: Tile): string {
     const [x, y] = position;
 
-    if (!tile.revealed) return (x + y) % 2 === 0 ? "#AAD650" : "#A2D048";
+    if (tile.state >= TileState.UNREVEALED)
+      return (x + y) % 2 === 0 ? "#AAD650" : "#A2D048";
     return (x + y) % 2 === 0 ? "#E4C29E" : "#D7B998";
   }
 
@@ -149,100 +162,110 @@ export default class Board {
         ctx.fillStyle = this.getTileColor([x, y], tile);
         ctx.fillRect(x, y, 1, 1);
 
-        if (tile.flagged) {
-          const frame = Math.min(
-            Math.floor((performance.now() - (tile.flaggedAt ?? 0)) / 20),
-            9
-          );
-          const image = ImageManager.get("flag_animation");
-          if (image) ctx.drawImage(image, 0, 81 * frame, 81, 81, x, y, 1, 1);
-        } else if (tile.revealed) {
-          if (tile.number > 0) {
-            ctx.fillStyle = TEXT_COLORS[tile.number] ?? "#000";
-            ctx.fillText(tile.number.toString(), x + 0.5, y + 0.5 + 0.05);
-          }
-          if (tile.number === -1) {
-            const image = ImageManager.get("bomb");
-            const revealTime = tile.revealedAt ?? 0;
-            const elapsed = (performance.now() - revealTime) / 1000;
-            const fade = Math.min(elapsed / 0.75, 1);
+        switch (tile.state) {
+          case TileState.REVEALED: {
+            if (tile.value > 0) {
+              ctx.fillStyle = TEXT_COLORS[tile.value] ?? "#000";
+              ctx.fillText(tile.value.toString(), x + 0.5, y + 0.5 + 0.05);
+            }
+            if (tile.value === -1) {
+              const image = ImageManager.get("bomb");
+              const revealTime = tile.interactedAt;
+              const elapsed = (performance.now() - revealTime) / 1000;
+              const fade = Math.min(elapsed / 0.75, 1);
 
-            if (image) {
-              ctx.drawImage(image, x, y, 1, 1);
-              if (fade > 0 && fade < 1) {
-                ctx.save();
-                ctx.globalAlpha = fade;
-                ctx.fillStyle = "#fff";
-                ctx.fillRect(x, y, 1, 1);
-                ctx.restore();
+              if (image) {
+                ctx.drawImage(image, x, y, 1, 1);
+                if (fade > 0 && fade < 1) {
+                  ctx.save();
+                  ctx.globalAlpha = fade;
+                  ctx.fillStyle = "#fff";
+                  ctx.fillRect(x, y, 1, 1);
+                  ctx.restore();
+                }
+              }
+
+              if (fade === 1) {
+                if (!tile.exploded) {
+                  this.particleManager.explode(x, y);
+                  AudioManager.play("confetti");
+                }
+                this.updateTile([x, y], { exploded: true });
               }
             }
 
-            if (fade === 1) {
-              if (!tile.exploded) {
-                this.particleManager.explode(x, y);
-                AudioManager.play("confetti");
-              }
-              this.updateTile([x, y], { exploded: true });
-            }
+            // draw borders
+            ctx.fillStyle = "#86AE3A";
+
+            const revealedNeighbors = {
+              left: this.getTile([x - 1, y]).state === TileState.REVEALED,
+              right: this.getTile([x + 1, y]).state === TileState.REVEALED,
+              top: this.getTile([x, y - 1]).state === TileState.REVEALED,
+              bottom: this.getTile([x, y + 1]).state === TileState.REVEALED,
+              topLeft:
+                this.getTile([x - 1, y - 1]).state === TileState.REVEALED,
+              topRight:
+                this.getTile([x + 1, y - 1]).state === TileState.REVEALED,
+              bottomLeft:
+                this.getTile([x - 1, y + 1]).state === TileState.REVEALED,
+              bottomRight:
+                this.getTile([x + 1, y + 1]).state === TileState.REVEALED,
+            };
+
+            if (!revealedNeighbors.left)
+              ctx.fillRect(x, y, this.borderThickness, 1);
+            if (!revealedNeighbors.right)
+              ctx.fillRect(
+                x + 1 - this.borderThickness,
+                y,
+                this.borderThickness,
+                1
+              );
+            if (!revealedNeighbors.top)
+              ctx.fillRect(x, y, 1, this.borderThickness);
+            if (!revealedNeighbors.bottom)
+              ctx.fillRect(
+                x,
+                y + 1 - this.borderThickness,
+                1,
+                this.borderThickness
+              );
+
+            if (!revealedNeighbors.topLeft)
+              ctx.fillRect(x, y, this.borderThickness, this.borderThickness);
+            if (!revealedNeighbors.topRight)
+              ctx.fillRect(
+                x + 1 - this.borderThickness,
+                y,
+                this.borderThickness,
+                this.borderThickness
+              );
+            if (!revealedNeighbors.bottomLeft)
+              ctx.fillRect(
+                x,
+                y + 1 - this.borderThickness,
+                this.borderThickness,
+                this.borderThickness
+              );
+            if (!revealedNeighbors.bottomRight)
+              ctx.fillRect(
+                x + 1 - this.borderThickness,
+                y + 1 - this.borderThickness,
+                this.borderThickness,
+                this.borderThickness
+              );
+
+            break;
           }
-
-          // draw borders
-          ctx.fillStyle = "#86AE3A";
-
-          const revealedNeighbors = {
-            left: this.getTile([x - 1, y]).revealed,
-            right: this.getTile([x + 1, y]).revealed,
-            top: this.getTile([x, y - 1]).revealed,
-            bottom: this.getTile([x, y + 1]).revealed,
-            topLeft: this.getTile([x - 1, y - 1]).revealed,
-            topRight: this.getTile([x + 1, y - 1]).revealed,
-            bottomLeft: this.getTile([x - 1, y + 1]).revealed,
-            bottomRight: this.getTile([x + 1, y + 1]).revealed,
-          };
-
-          if (!revealedNeighbors.left)
-            ctx.fillRect(x, y, this.borderThickness, 1);
-          if (!revealedNeighbors.right)
-            ctx.fillRect(
-              x + 1 - this.borderThickness,
-              y,
-              this.borderThickness,
-              1
+          case TileState.FLAGGED: {
+            const frame = Math.min(
+              Math.floor((performance.now() - tile.interactedAt) / 20),
+              9
             );
-          if (!revealedNeighbors.top)
-            ctx.fillRect(x, y, 1, this.borderThickness);
-          if (!revealedNeighbors.bottom)
-            ctx.fillRect(
-              x,
-              y + 1 - this.borderThickness,
-              1,
-              this.borderThickness
-            );
-
-          if (!revealedNeighbors.topLeft)
-            ctx.fillRect(x, y, this.borderThickness, this.borderThickness);
-          if (!revealedNeighbors.topRight)
-            ctx.fillRect(
-              x + 1 - this.borderThickness,
-              y,
-              this.borderThickness,
-              this.borderThickness
-            );
-          if (!revealedNeighbors.bottomLeft)
-            ctx.fillRect(
-              x,
-              y + 1 - this.borderThickness,
-              this.borderThickness,
-              this.borderThickness
-            );
-          if (!revealedNeighbors.bottomRight)
-            ctx.fillRect(
-              x + 1 - this.borderThickness,
-              y + 1 - this.borderThickness,
-              this.borderThickness,
-              this.borderThickness
-            );
+            const image = ImageManager.get("flag_animation");
+            if (image) ctx.drawImage(image, 0, 81 * frame, 81, 81, x, y, 1, 1);
+            break;
+          }
         }
       }
     }
@@ -256,35 +279,9 @@ export default class Board {
 
   public attemptReveal(position: Key): void {
     const tile = this.getTile(position);
-    if (tile.flagged) return;
+    if (tile.state >= TileState.FLAGGED) return;
 
-    if (tile.revealed) {
-      // count surrounding flags
-      let flaggedCount = 0;
-      for (let x = position[0] - 1; x <= position[0] + 1; x++) {
-        for (let y = position[1] - 1; y <= position[1] + 1; y++) {
-          if (x === position[0] && y === position[1]) continue;
-          const neighbor = this.getTile([x, y]);
-          if (neighbor.flagged) flaggedCount++;
-        }
-      }
-      if (flaggedCount === tile.number) {
-        // reveal surrounding tiles
-        for (let x = position[0] - 1; x <= position[0] + 1; x++) {
-          for (let y = position[1] - 1; y <= position[1] + 1; y++) {
-            if (x === position[0] && y === position[1]) continue;
-            const neighbor = this.getTile([x, y]);
-            if (!neighbor.revealed && !neighbor.flagged) {
-              this.attemptReveal([x, y]);
-            }
-          }
-        }
-      }
-      this.updateStats();
-      return;
-    }
-
-    // generate surrounding tiles
+    // Generate surrounding tiles
     for (let x = position[0] - 2; x <= position[0] + 2; x++) {
       for (let y = position[1] - 2; y <= position[1] + 2; y++) {
         if (x === position[0] && y === position[1]) continue; // skip the current tile
@@ -292,28 +289,54 @@ export default class Board {
       }
     }
 
-    // reveal tile
+    // Surrounding tiles shortcut
+    if (tile.state === TileState.REVEALED) {
+      // count surrounding flags
+      let flaggedCount = 0;
+      for (let x = position[0] - 1; x <= position[0] + 1; x++) {
+        for (let y = position[1] - 1; y <= position[1] + 1; y++) {
+          if (x === position[0] && y === position[1]) continue;
+          const neighbor = this.getTile([x, y]);
+          if (neighbor.state >= TileState.FLAGGED) flaggedCount++;
+        }
+      }
+      if (flaggedCount === tile.value) {
+        // reveal surrounding tiles
+        for (let x = position[0] - 1; x <= position[0] + 1; x++) {
+          for (let y = position[1] - 1; y <= position[1] + 1; y++) {
+            if (x === position[0] && y === position[1]) continue;
+            const neighbor = this.getTile([x, y]);
+            if (neighbor.state === TileState.UNREVEALED)
+              this.attemptReveal([x, y]);
+          }
+        }
+      }
+      this.updateStats();
+      return;
+    }
+
+    // Reveal the tile, effects
     const poppedTile = new Particle(
       { x: position[0], y: position[1] },
       this.getTileColor(position, tile)
     );
     this.updateTile(position, {
-      revealed: true,
-      revealedAt: performance.now(),
+      state: TileState.REVEALED,
+      interactedAt: performance.now(),
     });
     this.particleManager.add(poppedTile);
     this.tilesRevealed++;
 
-    const soundNum = Math.max(tile.number, 1);
-    if (tile.number >= 0) AudioManager.play(`blip_${soundNum}`);
-    if (tile.number === -1) {
+    const soundNum = Math.max(tile.value, 1);
+    if (tile.value >= 0) AudioManager.play(`blip_${soundNum}`);
+    if (tile.value === -1) {
       AudioManager.play("charge");
       this.game.hooks?.setGameActive(false);
       localStorage.removeItem("savedGame");
     }
 
-    // if tile is 0, reveal surrounding tiles
-    if (tile.number === 0)
+    // Reveal surrounding tiles if revealed tile is 0
+    if (tile.value === 0)
       for (let x = position[0] - 1; x <= position[0] + 1; x++) {
         for (let y = position[1] - 1; y <= position[1] + 1; y++) {
           if (x === position[0] && y === position[1]) continue;
@@ -335,20 +358,25 @@ export default class Board {
 
   public toggleFlag(position: Key): void {
     const tile = this.getTile(position);
-    if (tile.revealed) return;
+    if (tile.state === TileState.REVEALED) return;
 
     this.updateTile(position, {
-      flagged: !tile.flagged,
-      flaggedAt: performance.now(),
+      state:
+        tile.state === TileState.FLAGGED
+          ? TileState.UNREVEALED
+          : TileState.FLAGGED,
+      interactedAt: performance.now(),
     });
-    this.tilesFlagged += tile.flagged ? -1 : 1;
-    AudioManager.play(!tile.flagged ? "flag_down" : "flag_up");
-    if (tile.flagged) {
+    this.tilesFlagged += tile.state === TileState.FLAGGED ? -1 : 1;
+    AudioManager.play(
+      tile.state === TileState.FLAGGED ? "flag_up" : "flag_down"
+    );
+    if (tile.state === TileState.FLAGGED) {
       const image = ImageManager.get("flag");
       const poppedTile = new Particle(
         { x: position[0], y: position[1] },
         "#FF0000",
-        image ?? undefined
+        image
       );
       this.particleManager.add(poppedTile);
     }
@@ -359,7 +387,7 @@ export default class Board {
   public getFirstZero(remainder: number): Key | null {
     for (const [address, tile] of this.board.entries()) {
       const [x, y] = Board.getKey(address);
-      if (tile.number === 0 && (x + y) % 2 == remainder && x > 0 && y > 0)
+      if (tile.value === 0 && (x + y) % 2 == remainder && x > 0 && y > 0)
         return [x, y];
     }
     return null;
@@ -379,8 +407,9 @@ export default class Board {
     return {
       board: Array.from(this.board.entries()).reduce<string[]>(
         (acc, [address, tile]) => {
-          if (tile.revealed) acc.push(address);
-          else if (tile.flagged) acc.push(address.replace(",", "."));
+          if (tile.state === TileState.REVEALED) acc.push(address);
+          else if (tile.state >= TileState.FLAGGED)
+            acc.push(address.replace(",", "."));
           return acc;
         },
         []

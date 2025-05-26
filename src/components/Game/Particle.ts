@@ -7,7 +7,7 @@ export default class Particle {
   constructor(
     public position: Vector2,
     public color: string,
-    public image?: HTMLImageElement
+    public image: HTMLImageElement | null = null
   ) {}
 
   public update(): void {

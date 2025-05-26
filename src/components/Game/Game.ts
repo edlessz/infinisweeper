@@ -16,6 +16,13 @@ export interface GameStats {
   revealed: number;
 }
 
+interface GameHooks {
+  getStats: () => GameStats;
+  setStats: (stats: GameStats) => void;
+  getGameActive: () => boolean;
+  setGameActive: (active: boolean) => void;
+}
+
 export default class Game {
   public Board: Board;
   public camera: Camera;
@@ -176,11 +183,4 @@ export default class Game {
     this.hooks = hooks ?? null;
     this.Board.updateStats();
   }
-}
-
-interface GameHooks {
-  getStats: () => GameStats;
-  setStats: (stats: GameStats) => void;
-  getGameActive: () => boolean;
-  setGameActive: (active: boolean) => void;
 }
