@@ -17,7 +17,7 @@ export default class ParticleManager {
 
   public update(): void {
     this.entities = this.entities.filter(
-      (entity) => entity.deathTime > performance.now()
+      (entity) => entity.deathTime > performance.now(),
     );
     this.entities.forEach((entity) => {
       entity.particle.update();
@@ -36,7 +36,7 @@ export default class ParticleManager {
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
       const particle = new Particle(
         { x: x + Math.random(), y: y + Math.random() },
-        randomColor
+        randomColor,
       );
 
       const size = Math.random() * 0.25 + 0.25; // Random size between 0.25 and 0.5

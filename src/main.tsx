@@ -10,5 +10,5 @@ createRoot(document.getElementById("root")!).render(
     <ViewProvider defaultView={Views.MENU}>
       <App />
     </ViewProvider>
-  </StrictMode>
+  </StrictMode>,
 );

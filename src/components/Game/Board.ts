@@ -62,7 +62,7 @@ export default class Board {
     game: Game,
     bombChance?: number,
     seed?: number,
-    savedBoard?: string[]
+    savedBoard?: string[],
   ) {
     this.bombChance = bombChance ?? this.bombChance;
     this.seed = seed ?? Date.now();
@@ -152,7 +152,7 @@ export default class Board {
 
   public render(
     ctx: CanvasRenderingContext2D,
-    [boundTopLeft, boundBottomRight]: [Vector2, Vector2]
+    [boundTopLeft, boundBottomRight]: [Vector2, Vector2],
   ): number {
     ctx.font = "bold 0.75px 'Roboto'";
     ctx.textAlign = "center";
@@ -221,7 +221,7 @@ export default class Board {
                 x + 1 - this.borderThickness,
                 y,
                 this.borderThickness,
-                1
+                1,
               );
             if (!revealedNeighbors.top)
               ctx.fillRect(x, y, 1, this.borderThickness);
@@ -230,7 +230,7 @@ export default class Board {
                 x,
                 y + 1 - this.borderThickness,
                 1,
-                this.borderThickness
+                this.borderThickness,
               );
 
             if (!revealedNeighbors.topLeft)
@@ -240,21 +240,21 @@ export default class Board {
                 x + 1 - this.borderThickness,
                 y,
                 this.borderThickness,
-                this.borderThickness
+                this.borderThickness,
               );
             if (!revealedNeighbors.bottomLeft)
               ctx.fillRect(
                 x,
                 y + 1 - this.borderThickness,
                 this.borderThickness,
-                this.borderThickness
+                this.borderThickness,
               );
             if (!revealedNeighbors.bottomRight)
               ctx.fillRect(
                 x + 1 - this.borderThickness,
                 y + 1 - this.borderThickness,
                 this.borderThickness,
-                this.borderThickness
+                this.borderThickness,
               );
 
             break;
@@ -266,7 +266,7 @@ export default class Board {
           case TileState.FLAGGED: {
             const frame = Math.min(
               Math.floor((performance.now() - tile.interactedAt) / 20),
-              9
+              9,
             );
             const image = ImageManager.get("flag_animation");
             if (image) ctx.drawImage(image, 0, 81 * frame, 81, 81, x, y, 1, 1);
@@ -330,8 +330,8 @@ export default class Board {
     this.particleManager.add(
       new Particle(
         { x: position[0], y: position[1] },
-        this.getTileColor(position, tile)
-      )
+        this.getTileColor(position, tile),
+      ),
     );
     this.updateTile(position, {
       state: TileState.REVEALED,
@@ -352,7 +352,7 @@ export default class Board {
           if (x === position[0] && y === position[1]) continue;
           if (
             this.eventQueue.some(
-              (item) => item.position[0] === x && item.position[1] === y
+              (item) => item.position[0] === x && item.position[1] === y,
             )
           )
             continue;
@@ -380,7 +380,7 @@ export default class Board {
     });
     this.tilesFlagged += tile.state === TileState.FLAGGED ? -1 : 1;
     AudioManager.play(
-      tile.state === TileState.FLAGGED ? "flag_up" : "flag_down"
+      tile.state === TileState.FLAGGED ? "flag_up" : "flag_down",
     );
     if (tile.state === TileState.FLAGGED)
       this.particleManager.popFlag({ x: position[0], y: position[1] });
@@ -436,7 +436,7 @@ export default class Board {
             acc.push(address.replace(",", "."));
           return acc;
         },
-        []
+        [],
       ),
       seed: this.seed,
     };

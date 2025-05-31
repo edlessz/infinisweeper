@@ -37,7 +37,7 @@ export default class Camera {
     this.ppu += amount;
     this.ppu = Math.max(
       this.ppuBounds.min,
-      Math.min(this.ppu, this.ppuBounds.max)
+      Math.min(this.ppu, this.ppuBounds.max),
     );
 
     const worldAfter = this.toWorldSpace(position);

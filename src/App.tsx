@@ -9,14 +9,14 @@ import { useView, Views } from "./contexts/useView";
 
 const getSourceDictionary = (
   prefix: string,
-  items: string[]
+  items: string[],
 ): Record<string, string> =>
   items.reduce(
     (acc, file) => {
       acc[file.split(".")[0]] = prefix + file;
       return acc;
     },
-    {} as Record<string, string>
+    {} as Record<string, string>,
   );
 ImageManager.loadImages(
   getSourceDictionary("images/", [
@@ -25,7 +25,7 @@ ImageManager.loadImages(
     "flag_incorrect.png",
     "flag_floor.png",
     "bomb.png",
-  ])
+  ]),
 );
 AudioManager.loadAudios(
   getSourceDictionary("audio/", [
@@ -42,7 +42,7 @@ AudioManager.loadAudios(
     "blip_8.mp3",
     "charge.mp3",
     "confetti.mp3",
-  ])
+  ]),
 );
 
 export default function App() {
