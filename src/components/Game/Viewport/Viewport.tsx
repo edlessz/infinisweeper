@@ -1,9 +1,16 @@
 import "./Viewport.css";
 import { useEffect, useRef, useState } from "react";
 import Game, { GameStats } from "../Game";
-import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
+import {
+  CopyIcon,
+  Home,
+  SaveIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from "lucide-react";
 import { useView, Views } from "../../../contexts/useView";
 import Dialog from "../../Dialog/Dialog";
+import subtexts from "../subtexts.json";
 
 interface ViewportProps {
   game: Game;
@@ -13,6 +20,7 @@ interface ViewportProps {
 export default function Viewport({ game, newGame }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [saveText, setSaveText] = useState("");
+  const [subtext, setSubtext] = useState("");
   const { setView } = useView();
 
   const [stats, setStats] = useState<GameStats>({
@@ -47,6 +55,12 @@ export default function Viewport({ game, newGame }: ViewportProps) {
       setStats,
       getDialogVisible: () => dialogVisibleRef.current,
       setDialogVisible,
+      randomizeSubtext: () => {
+        const subtextsTyped: string[] = subtexts as string[];
+        setSubtext(
+          subtextsTyped[Math.floor(Math.random() * subtextsTyped.length)],
+        );
+      },
     });
 
     setDialogVisible(false);
@@ -124,6 +138,36 @@ export default function Viewport({ game, newGame }: ViewportProps) {
     }, 2000);
   };
 
+  const getShareContent = (): string => {
+    const points = stats.revealed
+      .toString()
+      .split("")
+      .map(
+        (n) =>
+          ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"][
+            parseInt(n)
+          ],
+      )
+      .join("");
+    return `I just scored ${points} points in Infinisweeper! Can you beat me? ${window.location.href}`;
+  };
+  const getFacebookShareLink = () =>
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(getShareContent())}`;
+  const getXShareLink = () =>
+    `https://x.com/intent/tweet?text=${encodeURIComponent(getShareContent())}`;
+  const copyShare = () => {
+    const shareContent = getShareContent();
+    navigator.clipboard
+      .writeText(shareContent)
+      .then(() => {
+        alert("Copied score to clipboard!");
+      })
+      .catch((err) => {
+        alert("Failed to copy score.");
+        console.error("Failed to copy share content:", err);
+      });
+  };
+
   return (
     <div className="Viewport">
       <canvas ref={canvasRef}></canvas>
@@ -159,8 +203,36 @@ export default function Viewport({ game, newGame }: ViewportProps) {
         </div>
       </div>
       <Dialog visible={dialogVisible} className="sweeped-dialog">
-        <h1>You've been sweeped!</h1>
-        <span>I'm disappointed.</span>
+        <div>
+          <h1>You've been sweeped!</h1>
+          <span className="subtext">{subtext}</span>
+        </div>
+        <div>
+          <span className="score">{stats.revealed} Points</span>
+          <div className="share-buttons">
+            <a
+              href={getFacebookShareLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                height="32"
+                width="32"
+                src="https://cdn.simpleicons.org/facebook"
+                alt="Share on Facebook"
+              />
+            </a>
+            <a href={getXShareLink()} target="_blank" rel="noopener noreferrer">
+              <img
+                height="32"
+                width="32"
+                src="https://cdn.simpleicons.org/x"
+                alt="Share on X"
+              />
+            </a>
+            <CopyIcon width={32} height={32} onClick={copyShare}></CopyIcon>
+          </div>
+        </div>
         <div className="button-container">
           {newGame && <button onClick={newGame}>New Game</button>}
           <button onClick={() => setView(Views.MENU)}>Main Menu</button>

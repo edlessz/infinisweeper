@@ -23,6 +23,7 @@ interface GameHooks {
   setGameActive: (active: boolean) => void;
   getDialogVisible: () => boolean;
   setDialogVisible: (visible: boolean) => void;
+  randomizeSubtext: () => void;
 }
 
 export default class Game {
@@ -162,6 +163,7 @@ export default class Game {
     this.hooks?.setGameActive(false);
     localStorage.removeItem(Game.savedGameKey);
     this.Board.showIncorrectFlags();
+    this.hooks?.randomizeSubtext();
     setTimeout(() => {
       this.hooks?.setDialogVisible(true);
     }, 2500);
