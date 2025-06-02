@@ -4,11 +4,14 @@ import "./index.css";
 import App from "./App.tsx";
 import { Views } from "./contexts/useView.ts";
 import { ViewProvider } from "./contexts/ViewProvider.tsx";
+import { DbProvider } from "./contexts/DbProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ViewProvider defaultView={Views.MENU}>
-      <App />
-    </ViewProvider>
+    <DbProvider>
+      <ViewProvider defaultView={Views.MENU}>
+        <App />
+      </ViewProvider>
+    </DbProvider>
   </StrictMode>,
 );

@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import { ViewContextValue } from "./ViewProvider";
 
 export enum Views {
   MENU = "menu",
@@ -7,11 +8,8 @@ export enum Views {
   SETTINGS = "settings",
 }
 
-export const ViewContext = createContext({
-  view: Views.MENU,
-  setView: (view: Views) => {
-    void view;
-  },
-});
+export const ViewContext = createContext<ViewContextValue | undefined>(
+  undefined,
+);
 
 export const useView = () => useContext(ViewContext);

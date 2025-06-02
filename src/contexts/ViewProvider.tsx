@@ -5,6 +5,10 @@ interface ViewProviderProps {
   children: React.ReactNode;
   defaultView?: Views;
 }
+export interface ViewContextValue {
+  view: Views;
+  setView: (view: Views) => void;
+}
 
 export const ViewProvider = ({
   children,

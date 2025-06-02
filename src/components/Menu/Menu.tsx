@@ -1,6 +1,7 @@
 import Game from "../Game/Game";
 import "./Menu.css";
 import MenuBackground from "./MenuBackground/MenuBackground";
+import { useDb } from "../../contexts/useDb";
 
 interface MenuProps {
   newGame: () => void;
@@ -10,6 +11,8 @@ interface MenuProps {
 export default function Menu({ newGame, continueGame }: MenuProps) {
   const existingGame: boolean =
     localStorage.getItem(Game.savedGameKey) !== null;
+
+  const { user, login, logout } = useDb()!;
 
   return (
     <div className="Menu">
@@ -24,6 +27,11 @@ export default function Menu({ newGame, continueGame }: MenuProps) {
         >
           Continue Game
         </button>
+        {user ? (
+          <button onClick={logout}>Sign Out</button>
+        ) : (
+          <button onClick={login}>Sign in with Google</button>
+        )}
       </div>
       <MenuBackground />
     </div>
