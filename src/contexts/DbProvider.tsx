@@ -12,6 +12,7 @@ interface DbProviderProps {
 }
 export interface DbContextValue {
   user: User | null;
+  name: string | null;
   session: Session | null;
   supabase: SupabaseClient;
   login: () => void;
@@ -24,8 +25,9 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export const DbProvider = ({ children }: DbProviderProps) => {
-  const [session, setSession] = useState<any | null>(null);
-  const [user, setUser] = useState<any | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -37,6 +39,16 @@ export const DbProvider = ({ children }: DbProviderProps) => {
       (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        supabase
+          .from("names")
+          .select("name")
+          .eq("uid", session?.user?.id)
+          .single()
+          .then(({ data, error }) => {
+            if (error)
+              console.error("Error fetching user profile:", error.message);
+            else setName(data?.name ?? null);
+          });
       },
     );
 
@@ -49,6 +61,7 @@ export const DbProvider = ({ children }: DbProviderProps) => {
     user,
     session,
     supabase,
+    name,
     login: () => {
       supabase.auth
         .signInWithOAuth({

@@ -1,16 +1,11 @@
 import "./Viewport.css";
 import { useEffect, useRef, useState } from "react";
 import Game, { GameStats } from "../Game";
-import {
-  CopyIcon,
-  Home,
-  SaveIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
-} from "lucide-react";
+import { CopyIcon } from "lucide-react";
 import { useView, Views } from "../../../contexts/useView";
 import Dialog from "../../Dialog/Dialog";
 import subtexts from "../subtexts.json";
+import Menubar from "../Menubar/Menubar";
 
 interface ViewportProps {
   game: Game;
@@ -19,9 +14,8 @@ interface ViewportProps {
 
 export default function Viewport({ game, newGame }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [saveText, setSaveText] = useState("");
   const [subtext, setSubtext] = useState("");
-  const { setView } = useView();
+  const { setView } = useView()!;
 
   const [stats, setStats] = useState<GameStats>({
     flags: 0,
@@ -110,34 +104,6 @@ export default function Viewport({ game, newGame }: ViewportProps) {
     };
   }, [game]);
 
-  const saveTextTimeout = useRef<number | null>(null);
-  const saveTextRef = useRef<HTMLSpanElement>(null);
-  const saveGame = () => {
-    setSaveText("Saving...");
-    const saveData = game.getSaveData();
-    if (saveData) {
-      localStorage.setItem(Game.savedGameKey, JSON.stringify(saveData));
-      setSaveText("Saved!");
-    } else {
-      setSaveText("No game to save.");
-    }
-
-    if (saveTextRef.current) {
-      saveTextRef.current.classList.remove("fade-out");
-
-      requestAnimationFrame(() => {
-        void saveTextRef.current?.offsetWidth; // Trigger reflow
-        saveTextRef.current?.classList.add("fade-out");
-      });
-    }
-
-    if (saveTextTimeout.current) clearTimeout(saveTextTimeout.current);
-    saveTextTimeout.current = window.setTimeout(() => {
-      setSaveText("");
-      saveTextTimeout.current = null;
-    }, 2000);
-  };
-
   const getShareContent = (): string => {
     const points = stats.revealed
       .toString()
@@ -171,37 +137,7 @@ export default function Viewport({ game, newGame }: ViewportProps) {
   return (
     <div className="Viewport">
       <canvas ref={canvasRef}></canvas>
-      <div className="overlay">
-        <div>
-          <button className="circleBtn" onClick={() => setView(Views.MENU)}>
-            <Home size={16} />
-          </button>
-          <button
-            className="circleBtn"
-            onClick={() => gameActive && saveGame()}
-            disabled={!gameActive}
-          >
-            <SaveIcon size={16} />
-          </button>
-          <span ref={saveTextRef}>{saveText}</span>
-        </div>
-        <div className="overlay-center">
-          <span>
-            <img src="./images/shovel.png"></img> {stats.revealed}
-          </span>
-          <span>
-            <img src="./images/flag.png"></img> {stats.flags}
-          </span>
-        </div>
-        <div className="overlay-right">
-          <button className="circleBtn" onClick={() => game.zoom(1)}>
-            <ZoomInIcon size={16} />
-          </button>
-          <button className="circleBtn" onClick={() => game.zoom(-1)}>
-            <ZoomOutIcon size={16} />
-          </button>
-        </div>
-      </div>
+      <Menubar gameActive={gameActive} game={game} stats={stats} />
       <Dialog visible={dialogVisible} className="sweeped-dialog">
         <div>
           <h1>You've been sweeped!</h1>

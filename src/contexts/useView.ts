@@ -4,7 +4,7 @@ import { ViewContextValue } from "./ViewProvider";
 export enum Views {
   MENU = "menu",
   GAME = "game",
-  SCORES = "scores",
+  SCOREBOARD = "scoreboard",
   SETTINGS = "settings",
 }
 

@@ -2,6 +2,7 @@ import Game from "../Game/Game";
 import "./Menu.css";
 import MenuBackground from "./MenuBackground/MenuBackground";
 import { useDb } from "../../contexts/useDb";
+import { LogIn, LogOut } from "lucide-react";
 
 interface MenuProps {
   newGame: () => void;
@@ -12,7 +13,7 @@ export default function Menu({ newGame, continueGame }: MenuProps) {
   const existingGame: boolean =
     localStorage.getItem(Game.savedGameKey) !== null;
 
-  const { user, login, logout } = useDb()!;
+  const { user, name, login, logout } = useDb()!;
 
   return (
     <div className="Menu">
@@ -27,13 +28,25 @@ export default function Menu({ newGame, continueGame }: MenuProps) {
         >
           Continue Game
         </button>
-        {user ? (
-          <button onClick={logout}>Sign Out</button>
-        ) : (
-          <button onClick={login}>Sign in with Google</button>
-        )}
       </div>
       <MenuBackground />
+      <div className="account">
+        {user ? (
+          <>
+            <span>{name ? name : "Loading..."}</span>
+            <button className="circle-btn" onClick={logout}>
+              <LogOut />
+            </button>
+          </>
+        ) : (
+          <>
+            <span className="signed-out-label">Signed Out</span>
+            <button className="circle-btn" onClick={login}>
+              <LogIn />
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
