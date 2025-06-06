@@ -51,4 +51,9 @@ export default class Camera {
     this.position.x += (Math.random() - 0.5) * shakiness;
     this.position.y += (Math.random() - 0.5) * shakiness;
   }
+
+  public roundToPixel(): void {
+    this.position.x = Math.round(this.position.x * this.ppu) / this.ppu;
+    this.position.y = Math.round(this.position.y * this.ppu) / this.ppu;
+  }
 }

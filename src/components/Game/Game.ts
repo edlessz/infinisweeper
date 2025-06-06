@@ -65,6 +65,7 @@ export default class Game {
   }
   public render(ctx: CanvasRenderingContext2D): void {
     ctx.scale(this.camera.ppu, this.camera.ppu);
+    this.camera.roundToPixel();
     ctx.translate(-this.camera.position.x, -this.camera.position.y);
 
     this.Board.render(ctx, this.camera.getBounds(this.size));
