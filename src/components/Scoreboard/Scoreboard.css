@@ -1,0 +1,22 @@
+.Scoreboard {
+  h1 {
+    margin: 0;
+  }
+  .table {
+    background: rgba(255, 255, 255, 0.75);
+    padding: 1rem;
+    border-radius: 1rem;
+
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+
+    .header {
+      text-align: center;
+      font-weight: bold;
+    }
+    tr > td:last-child {
+      text-align: right;
+    }
+  }
+}

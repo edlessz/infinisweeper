@@ -1,0 +1,18 @@
+.MainMenu {
+  h1 img {
+    width: 1.5rem;
+  }
+  .account {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .signed-out-label {
+      color: darkred;
+    }
+  }
+}

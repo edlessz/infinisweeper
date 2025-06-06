@@ -39,16 +39,17 @@ export const DbProvider = ({ children }: DbProviderProps) => {
       (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        supabase
-          .from("names")
-          .select("name")
-          .eq("uid", session?.user?.id)
-          .single()
-          .then(({ data, error }) => {
-            if (error)
-              console.error("Error fetching user profile:", error.message);
-            else setName(data?.name ?? null);
-          });
+        if (session?.user?.id)
+          supabase
+            .from("names")
+            .select("name")
+            .eq("uid", session?.user?.id)
+            .single()
+            .then(({ data, error }) => {
+              if (error)
+                console.error("Error fetching user profile:", error.message);
+              else setName(data?.name ?? null);
+            });
       },
     );
 

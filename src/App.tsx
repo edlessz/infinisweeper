@@ -4,8 +4,9 @@ import AudioManager from "./components/Game/AudioManager";
 import Game, { SaveData } from "./components/Game/Game";
 import ImageManager from "./components/Game/ImageManager";
 import Viewport from "./components/Game/Viewport/Viewport";
-import Menu from "./components/Menu/Menu";
+import Menu from "./components/MainMenu/MainMenu";
 import { useView, Views } from "./contexts/useView";
+import Scoreboard from "./components/Scoreboard/Scoreboard";
 
 const getSourceDictionary = (
   prefix: string,
@@ -46,7 +47,7 @@ AudioManager.loadAudios(
 );
 
 export default function App() {
-  const { view, setView } = useView();
+  const { view, setView } = useView()!;
   const [game, setGame] = useState<Game | null>(null);
 
   const newGame = (): void => {
@@ -72,5 +73,7 @@ export default function App() {
       ) : (
         <div>Could not find game.</div>
       );
+    case Views.SCOREBOARD:
+      return <Scoreboard />;
   }
 }

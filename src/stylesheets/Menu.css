@@ -1,0 +1,17 @@
+.Menu {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  background-color: #4ac0fd;
+  position: relative;
+}
+.foreground {
+  z-index: 2;
+}
