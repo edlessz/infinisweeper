@@ -1,7 +1,6 @@
 import "./Viewport.css";
 import { useEffect, useRef, useState } from "react";
 import Game, { GameStats } from "../Game";
-import { useView } from "../../../contexts/useView";
 import subtexts from "../subtexts.json";
 import Menubar from "../Menubar/Menubar";
 import SweepedDialog from "../SweepedDialog/SweepedDialog";
@@ -14,7 +13,6 @@ interface ViewportProps {
 export default function Viewport({ game, newGame }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [subtext, setSubtext] = useState("");
-  const { setView } = useView()!;
 
   const [stats, setStats] = useState<GameStats>({
     flags: 0,

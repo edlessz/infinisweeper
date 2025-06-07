@@ -42,7 +42,7 @@ export default function Scoreboard() {
     <div className="Scoreboard Menu">
       <MenuBackground />
       <h1>Scoreboard</h1>
-      <div className="table foreground">
+      <div className="table">
         {scoreboard === null && <span>Loading...</span>}
         {Object.entries(scoreboard || {}).map(([gameTypeId, scores]) => (
           <div key={gameTypeId} className="scoreboard-table">
@@ -66,7 +66,7 @@ export default function Scoreboard() {
           </div>
         ))}
       </div>
-      <div className="button-container foreground">
+      <div className="button-container">
         <button onClick={() => setView(Views.MENU)}>Back</button>
       </div>
     </div>

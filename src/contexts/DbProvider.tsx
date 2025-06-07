@@ -17,6 +17,7 @@ export interface DbContextValue {
   supabase: SupabaseClient;
   login: () => void;
   logout: () => void;
+  updateName: (name: string) => void;
 }
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -77,6 +78,14 @@ export const DbProvider = ({ children }: DbProviderProps) => {
       supabase.auth
         .signOut()
         .catch((error) => console.error("Error signing out:", error.message));
+    },
+    updateName: async (name: string) => {
+      if (!user || !session) return;
+      const { error } = await supabase
+        .from("names")
+        .upsert({ uid: session.user.id, name }, { onConflict: "uid" });
+      if (error) throw error;
+      setName(name);
     },
   };
 

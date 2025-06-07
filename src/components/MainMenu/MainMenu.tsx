@@ -20,10 +20,11 @@ export default function MainMenu({ newGame, continueGame }: MainMenuProps) {
 
   return (
     <div className="MainMenu Menu">
+      <MenuBackground />
       <h1>
         Infinisweeper <img src="./images/flag.png"></img>
       </h1>
-      <div className="button-container foreground">
+      <div className="button-container">
         <button onClick={newGame}>New Game</button>
         <button
           onClick={() => existingGame && continueGame()}
@@ -32,9 +33,9 @@ export default function MainMenu({ newGame, continueGame }: MainMenuProps) {
           Continue Game
         </button>
         <button onClick={() => setView(Views.SCOREBOARD)}>Scoreboard</button>
+        <button onClick={() => setView(Views.SETTINGS)}>Settings</button>
       </div>
-      <MenuBackground />
-      <div className="account foreground">
+      <div className="account">
         {user ? (
           <>
             <span>{name ? name : "Loading..."}</span>

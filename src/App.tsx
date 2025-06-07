@@ -7,6 +7,7 @@ import Viewport from "./components/Game/Viewport/Viewport";
 import Menu from "./components/MainMenu/MainMenu";
 import { useView, Views } from "./contexts/useView";
 import Scoreboard from "./components/Scoreboard/Scoreboard";
+import Settings from "./components/Settings/Settings";
 
 const getSourceDictionary = (
   prefix: string,
@@ -75,5 +76,7 @@ export default function App() {
       );
     case Views.SCOREBOARD:
       return <Scoreboard />;
+    case Views.SETTINGS:
+      return <Settings />;
   }
 }
