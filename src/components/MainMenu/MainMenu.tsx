@@ -52,6 +52,15 @@ export default function MainMenu({ newGame, continueGame }: MainMenuProps) {
           </>
         )}
       </div>
+      <div className="links">
+        <a href="https://edlessz.com" target="_blank">
+          edlessz
+        </a>
+        <span>•</span>
+        <a href="https://github.com/edlessz/infinisweeper" target="_blank">
+          GitHub
+        </a>
+      </div>
     </div>
   );
 }
