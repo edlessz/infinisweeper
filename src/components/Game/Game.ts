@@ -75,25 +75,104 @@ export default class Game {
     this.Board.render(ctx, this.camera.getBounds(this.size));
   }
 
-  public pan = (): void => {
-    let mouseMoved = false;
-    const mouseMove = (event: MouseEvent) => {
-      if (mouseMoved) {
-        this.camera.position.x -= event.movementX / this.camera.ppu;
-        this.camera.position.y -= event.movementY / this.camera.ppu;
-      }
-      if (Math.abs(event.movementX) > 2 || Math.abs(event.movementY) > 2)
-        mouseMoved = true;
+  public pan = (event: MouseEvent | TouchEvent): void => {
+    event.preventDefault();
+
+    if (event instanceof MouseEvent) {
+      let mouseMoved = false;
+      const mouseMove = (event: MouseEvent) => {
+        if (mouseMoved) {
+          this.camera.position.x -= event.movementX / this.camera.ppu;
+          this.camera.position.y -= event.movementY / this.camera.ppu;
+        }
+        if (Math.abs(event.movementX) > 2 || Math.abs(event.movementY) > 2)
+          mouseMoved = true;
+      };
+      window.addEventListener("mousemove", mouseMove);
+      window.addEventListener(
+        "mouseup",
+        (mouseUpEvent) => {
+          window.removeEventListener("mousemove", mouseMove);
+          if (!mouseMoved) this.mouseClick(mouseUpEvent);
+        },
+        { once: true },
+      );
+    } else {
+      if (event.touches.length !== 1) return;
+      let lastTouch: Vector2 = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+      };
+      let touchMoved = false;
+      const touchStartTime = performance.now();
+
+      const touchMove = (e: TouchEvent) => {
+        const touch = e.touches[0];
+        const dx = touch.clientX - lastTouch.x;
+        const dy = touch.clientY - lastTouch.y;
+
+        if (touchMoved || Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+          this.camera.position.x -= dx / this.camera.ppu;
+          this.camera.position.y -= dy / this.camera.ppu;
+          lastTouch.x = touch.clientX;
+          lastTouch.y = touch.clientY;
+          touchMoved = true;
+        }
+      };
+
+      let timeout: number;
+      const triggerTime = 250;
+      const touchEnd = (e: TouchEvent) => {
+        window.clearTimeout(timeout);
+        window.removeEventListener("touchmove", touchMove);
+        window.removeEventListener("touchend", touchEnd);
+        if (!touchMoved)
+          this.mouseClick(e, performance.now() - touchStartTime > triggerTime);
+      };
+
+      window.addEventListener("touchmove", touchMove);
+      window.addEventListener("touchend", touchEnd, { once: true });
+      timeout = window.setTimeout(() => {
+        if (!touchMoved) touchEnd(event);
+      }, triggerTime);
+    }
+  };
+  public mouseClick = (
+    event: MouseEvent | TouchEvent,
+    hold?: boolean,
+  ): void => {
+    event.preventDefault();
+    if (!this.hooks?.getGameActive()) return;
+
+    const screenSpace: Vector2 = {
+      x:
+        event instanceof MouseEvent
+          ? event.clientX
+          : event.changedTouches[0].clientX,
+      y:
+        event instanceof MouseEvent
+          ? event.clientY
+          : event.changedTouches[0].clientY,
     };
-    window.addEventListener("mousemove", mouseMove);
-    window.addEventListener(
-      "mouseup",
-      (mouseUpEvent) => {
-        window.removeEventListener("mousemove", mouseMove);
-        if (!mouseMoved) this.mouseClick(mouseUpEvent);
-      },
-      { once: true },
-    );
+    let mouse = this.camera.toWorldSpace(screenSpace);
+
+    const doClick = (eventButton: number, mouse: Vector2) => {
+      switch (eventButton) {
+        case 0:
+          if (!this.gameStarted) this.findFirstClick(mouse);
+          mouse = this.camera.toWorldSpace(screenSpace);
+          this.Board.attemptReveal([Math.floor(mouse.x), Math.floor(mouse.y)]);
+          this.gameStarted = true;
+          break;
+        case 2:
+          if (this.gameStarted)
+            this.Board.toggleFlag([Math.floor(mouse.x), Math.floor(mouse.y)]);
+          break;
+      }
+    };
+
+    if (event instanceof MouseEvent) doClick(event.button, mouse);
+    else if (event instanceof TouchEvent) doClick(!hold ? 0 : 2, mouse);
   };
   public wheelZoom = (event: WheelEvent): void => {
     event.preventDefault();
@@ -108,6 +187,42 @@ export default class Game {
       event.deltaY < 0 ? 1 : -1,
     );
   };
+  public pinchZoom = (event: TouchEvent): void => {
+    event.preventDefault();
+    if (!this.canvas || event.touches.length !== 2) return;
+
+    const [touch1, touch2] = event.touches;
+    const dist = (touch1: Touch, touch2: Touch): number => {
+      return Math.sqrt(
+        (touch1.clientX - touch2.clientX) ** 2 +
+          (touch1.clientY - touch2.clientY) ** 2,
+      );
+    };
+    let initialDistance = dist(touch1, touch2);
+
+    const touchMove = (e: TouchEvent): void => {
+      if (e.touches.length !== 2) return;
+
+      const newDistance = dist(e.touches[0], e.touches[1]);
+      const zoomAmount = (newDistance - initialDistance) / 10;
+      initialDistance = newDistance;
+
+      const middlePoint = {
+        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        y: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+      };
+
+      this.camera.zoomInPosition(middlePoint, zoomAmount);
+      this.camera.roundToPixel();
+    };
+
+    window.addEventListener("touchmove", touchMove, { passive: false });
+    window.addEventListener(
+      "touchend",
+      () => window.removeEventListener("touchmove", touchMove),
+      { once: true },
+    );
+  };
   public zoom = (amt: number): void => {
     if (!this.canvas) return;
 
@@ -120,27 +235,6 @@ export default class Game {
     );
   };
 
-  public mouseClick = (event: MouseEvent): void => {
-    event.preventDefault();
-    if (!this.hooks?.getGameActive()) return;
-
-    let mouse = this.camera.toWorldSpace({
-      x: event.clientX,
-      y: event.clientY,
-    });
-
-    if (event.button === 0) {
-      if (!this.gameStarted) this.findFirstClick(mouse);
-      mouse = this.camera.toWorldSpace({
-        x: event.clientX,
-        y: event.clientY,
-      });
-      this.Board.attemptReveal([Math.floor(mouse.x), Math.floor(mouse.y)]);
-      this.gameStarted = true;
-    }
-    if (event.button === 2 && this.gameStarted)
-      this.Board.toggleFlag([Math.floor(mouse.x), Math.floor(mouse.y)]);
-  };
   public cancelContextMenu = (event: MouseEvent): void =>
     event.preventDefault();
 
@@ -187,13 +281,17 @@ export default class Game {
 
   public addEventListeners(): void {
     if (!this.canvas) return;
+    this.canvas.addEventListener("touchstart", this.pan);
     this.canvas.addEventListener("mousedown", this.pan);
+    this.canvas.addEventListener("touchstart", this.pinchZoom);
     this.canvas.addEventListener("wheel", this.wheelZoom);
     this.canvas.addEventListener("contextmenu", this.cancelContextMenu);
   }
   public removeEventListeners(): void {
     if (!this.canvas) return;
+    this.canvas.removeEventListener("touchstart", this.pan);
     this.canvas.removeEventListener("mousedown", this.pan);
+    this.canvas.removeEventListener("touchstart", this.pinchZoom);
     this.canvas.removeEventListener("wheel", this.wheelZoom);
     this.canvas.removeEventListener("contextmenu", this.cancelContextMenu);
   }
