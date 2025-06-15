@@ -1,3 +1,5 @@
+v3.0,6/15/25
+-Rebuilt in React + TypeScript + Supabase
 v2.4,1/15/23
 -Added initial loading screen before first game load
 v2.3,9/5/22
