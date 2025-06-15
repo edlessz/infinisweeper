@@ -30,6 +30,10 @@ export default class ParticleManager {
     });
   }
 
+  public clear(): void {
+    this.entities = [];
+  }
+
   public explode(x: number, y: number): void {
     for (let i = 0; i < 250; i++) {
       const colors = ["red", "yellow", "orange"];

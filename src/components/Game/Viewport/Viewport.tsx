@@ -4,6 +4,7 @@ import Game, { GameStats } from "../Game";
 import subtexts from "../subtexts.json";
 import Menubar from "../Menubar/Menubar";
 import SweepedDialog from "../SweepedDialog/SweepedDialog";
+import { useSettings } from "../../../contexts/useSettings";
 
 interface ViewportProps {
   game: Game;
@@ -13,6 +14,7 @@ interface ViewportProps {
 export default function Viewport({ game, newGame }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [subtext, setSubtext] = useState("");
+  const { settings } = useSettings()!;
 
   const [stats, setStats] = useState<GameStats>({
     flags: 0,
@@ -44,6 +46,7 @@ export default function Viewport({ game, newGame }: ViewportProps) {
       setGameActive,
       getStats: () => statsRef.current,
       setStats,
+      getSettings: () => settings,
       getDialogVisible: () => dialogVisibleRef.current,
       setDialogVisible,
       randomizeSubtext: () => {

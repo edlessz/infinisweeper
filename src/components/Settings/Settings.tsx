@@ -9,7 +9,7 @@ import { useSettings } from "../../contexts/useSettings";
 export default function Settings() {
   const { setView } = useView()!;
   const { updateName, user, name } = useDb()!;
-  const { settings, saveSettings } = useSettings()!;
+  const { settings, saveSettings, settingsDescriptions } = useSettings()!;
 
   const [nameField, setNameField] = useState<string>(name ?? "");
   const [localSettings, setLocalSettings] = useState(settings);
@@ -39,16 +39,16 @@ export default function Settings() {
       console.error(error);
     }
   };
-  const discard = () => {
-    setView(Views.MENU);
-  };
-
+  const discard = () => setView(Views.MENU);
   return (
     <div className="Settings Menu">
       <MenuBackground />
       <h1>Settings</h1>
       <div className="table ed-form">
-        <span>Display Name:</span>
+        <div>
+          <span>Display Name:</span>
+          <div>Your username on the scoreboards.</div>
+        </div>
         <input
           type="text"
           defaultValue={user ? nameField : ""}
@@ -56,12 +56,50 @@ export default function Settings() {
           disabled={!user}
           placeholder={user ? "Enter Display Name" : "Please Sign In!"}
         ></input>
-        <span>Classic Background:</span>
+
+        <div>
+          <span>Classic Background:</span>
+          <div>{settingsDescriptions.classicBackground}</div>
+        </div>
         <input
           type="checkbox"
           checked={localSettings.classicBackground}
           onChange={(e) =>
             setLocalSetting("classicBackground", e.target.checked)
+          }
+        ></input>
+
+        <div>
+          <span>Disable Borders:</span>
+          <div>{settingsDescriptions.disableBorders}</div>
+        </div>
+        <input
+          type="checkbox"
+          checked={localSettings.disableBorders}
+          onChange={(e) => setLocalSetting("disableBorders", e.target.checked)}
+        ></input>
+
+        <div>
+          <span>Disable Camera Shake:</span>
+          <div>{settingsDescriptions.disableCameraShake}</div>
+        </div>
+        <input
+          type="checkbox"
+          checked={localSettings.disableCameraShake}
+          onChange={(e) =>
+            setLocalSetting("disableCameraShake", e.target.checked)
+          }
+        ></input>
+
+        <div>
+          <span>Disable Particles:</span>
+          <div>{settingsDescriptions.disableParticles}</div>
+        </div>
+        <input
+          type="checkbox"
+          checked={localSettings.disableParticles}
+          onChange={(e) =>
+            setLocalSetting("disableParticles", e.target.checked)
           }
         ></input>
       </div>

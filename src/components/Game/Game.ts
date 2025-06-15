@@ -1,3 +1,4 @@
+import { Settings } from "../../contexts/SettingsProvider";
 import Board from "./Board";
 import Camera from "./Camera";
 import Vector2 from "./Vector2";
@@ -23,6 +24,7 @@ interface GameHooks {
   setGameActive: (active: boolean) => void;
   getDialogVisible: () => boolean;
   setDialogVisible: (visible: boolean) => void;
+  getSettings: () => Settings;
   randomizeSubtext: () => void;
 }
 
@@ -59,9 +61,11 @@ export default class Game {
     void deltaTime;
     this.Board.update();
 
-    const revealQueueLength = this.Board.getRevealQueueLength();
-    if (revealQueueLength > 10)
-      this.camera.shake(this.Board.getRevealQueueLength() * 0.01);
+    if (!this.hooks?.getSettings().disableCameraShake) {
+      const revealQueueLength = this.Board.getRevealQueueLength();
+      if (revealQueueLength > 10)
+        this.camera.shake(this.Board.getRevealQueueLength() * 0.01);
+    }
   }
   public render(ctx: CanvasRenderingContext2D): void {
     ctx.scale(this.camera.ppu, this.camera.ppu);
