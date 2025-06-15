@@ -27,6 +27,7 @@ ImageManager.loadImages(
     "flag_incorrect.png",
     "flag_floor.png",
     "bomb.png",
+    "shovel.png",
   ]),
 );
 AudioManager.loadAudios(
