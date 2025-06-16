@@ -1,12 +1,13 @@
 [
   {
-    "version": "3.1",
+    "version": "Hotfix 3.0.1",
     "date": "2025-06-15",
     "changes": [
       "Re-added changelog view",
       "Re-added ctrl/shift + click to flag",
       "Re-added favicon",
       "Re-added readme",
+      "Fixed eslint config",
       "Fixed sign-in redirect bug"
     ]
   },
