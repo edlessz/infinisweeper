@@ -25,7 +25,7 @@ ImageManager.loadImages(
     "shovel.png",
   ]),
 );
-await AudioManager.loadAudios(
+AudioManager.loadAudios(
   getSourceDictionary("audio/", [
     "reveal.mp3",
     "flag_down.mp3",
