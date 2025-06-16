@@ -171,8 +171,10 @@ export default class Game {
       }
     };
 
-    if (event instanceof MouseEvent) doClick(event.button, mouse);
-    else if (event instanceof TouchEvent) doClick(!hold ? 0 : 2, mouse);
+    if (event instanceof MouseEvent) {
+      if (event.ctrlKey || event.shiftKey || event.metaKey) doClick(2, mouse);
+      else doClick(event.button, mouse);
+    } else if (event instanceof TouchEvent) doClick(!hold ? 0 : 2, mouse);
   };
   public wheelZoom = (event: WheelEvent): void => {
     event.preventDefault();

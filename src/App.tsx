@@ -8,6 +8,7 @@ import Menu from "./components/MainMenu/MainMenu";
 import { useView, Views } from "./contexts/useView";
 import Scoreboard from "./components/Scoreboard/Scoreboard";
 import Settings from "./components/Settings/Settings";
+import Changelog from "./components/Changelog/Changelog";
 
 const getSourceDictionary = (
   prefix: string,
@@ -79,5 +80,7 @@ export default function App() {
       return <Scoreboard />;
     case Views.SETTINGS:
       return <Settings />;
+    case Views.CHANGELOG:
+      return <Changelog />;
   }
 }

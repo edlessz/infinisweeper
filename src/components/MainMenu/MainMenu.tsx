@@ -60,6 +60,10 @@ export default function MainMenu({ newGame, continueGame }: MainMenuProps) {
         <a href="https://github.com/edlessz/infinisweeper" target="_blank">
           GitHub
         </a>
+        <span>•</span>
+        <a href="javascript:void(0)" onClick={() => setView(Views.CHANGELOG)}>
+          Changelog
+        </a>
       </div>
     </div>
   );

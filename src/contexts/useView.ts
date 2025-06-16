@@ -6,6 +6,7 @@ export enum Views {
   GAME = "game",
   SCOREBOARD = "scoreboard",
   SETTINGS = "settings",
+  CHANGELOG = "changelog",
 }
 
 export const ViewContext = createContext<ViewContextValue | undefined>(
