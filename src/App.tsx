@@ -10,17 +10,11 @@ import Scoreboard from "./components/Scoreboard/Scoreboard";
 import Settings from "./components/Settings/Settings";
 import Changelog from "./components/Changelog/Changelog";
 
-const getSourceDictionary = (
-  prefix: string,
-  items: string[],
-): Record<string, string> =>
-  items.reduce(
-    (acc, file) => {
-      acc[file.split(".")[0]] = prefix + file;
-      return acc;
-    },
-    {} as Record<string, string>,
-  );
+const getSourceDictionary = (prefix: string, items: string[]) =>
+  items.reduce<Record<string, string>>((acc, file) => {
+    acc[file.split(".")[0]] = prefix + file;
+    return acc;
+  }, {});
 ImageManager.loadImages(
   getSourceDictionary("images/", [
     "flag.png",
@@ -31,7 +25,7 @@ ImageManager.loadImages(
     "shovel.png",
   ]),
 );
-AudioManager.loadAudios(
+await AudioManager.loadAudios(
   getSourceDictionary("audio/", [
     "reveal.mp3",
     "flag_down.mp3",
@@ -59,9 +53,12 @@ export default function App() {
   };
   const continueGame = (): void => {
     const savedGame: SaveData | undefined =
-      JSON.parse(localStorage.getItem(Game.savedGameKey) || "null") ??
+      JSON.parse(localStorage.getItem(Game.savedGameKey) ?? "null") ??
       undefined;
-    if (!savedGame) return console.error("No saved game found.");
+    if (!savedGame) {
+      console.error("No saved game found.");
+      return;
+    }
     setGame(new Game(savedGame));
     setView(Views.GAME);
   };

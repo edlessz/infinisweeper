@@ -99,7 +99,7 @@ export default class Game {
       );
     } else {
       if (event.touches.length !== 1) return;
-      let lastTouch: Vector2 = {
+      const lastTouch: Vector2 = {
         x: event.touches[0].clientX,
         y: event.touches[0].clientY,
       };
@@ -154,7 +154,7 @@ export default class Game {
           ? event.clientY
           : event.changedTouches[0].clientY,
     };
-    let mouse = this.camera.toWorldSpace(screenSpace);
+    const mouse = this.camera.toWorldSpace(screenSpace);
 
     const doClick = (eventButton: number, mouse: Vector2) => {
       switch (eventButton) {
@@ -237,8 +237,10 @@ export default class Game {
     );
   };
 
-  public cancelContextMenu = (event: MouseEvent): void =>
+  public cancelContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
+    return;
+  };
 
   public findFirstClick(mouse: Vector2): void {
     const firstZero = this.Board.getFirstZero(

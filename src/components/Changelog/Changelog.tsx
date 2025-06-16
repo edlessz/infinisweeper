@@ -24,7 +24,7 @@ export default function Changelog() {
       <div className="table changes">
         {changelog ? (
           changelog.map((entry) => (
-            <details>
+            <details key={entry.version}>
               <summary>
                 <span>{entry.version}</span>
                 <span>{entry.date}</span>

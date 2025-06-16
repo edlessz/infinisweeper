@@ -67,7 +67,14 @@ export default function Scoreboard() {
         ))}
       </div>
       <div className="button-container">
-        <button onClick={() => setView(Views.MENU)}>Back</button>
+        <button
+          type="button"
+          onClick={() => {
+            setView(Views.MENU);
+          }}
+        >
+          Back
+        </button>
       </div>
     </div>
   );
