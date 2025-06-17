@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { DbContext } from "./DbContext";
+import { App } from "@capacitor/app";
+import { Capacitor, type PluginListenerHandle } from "@capacitor/core";
 import {
-  createClient,
   type Session,
   type SupabaseClient,
   type User,
+  createClient,
 } from "@supabase/supabase-js";
-import { Capacitor, type PluginListenerHandle } from "@capacitor/core";
-import { App } from "@capacitor/app";
+import { useEffect, useState } from "react";
+import { DbContext } from "./DbContext";
 
 interface DbProviderProps {
   children: React.ReactNode;
@@ -64,7 +64,7 @@ export const DbProvider = ({ children }: DbProviderProps) => {
                 console.error("Error fetching user profile:", error.message);
               else setName(data?.name ?? null);
             });
-      }
+      },
     );
 
     let listenerHandle: PluginListenerHandle;

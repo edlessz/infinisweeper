@@ -1,15 +1,15 @@
 import "../../stylesheets/Menu.css";
 import "./Scoreboard.css";
-import MenuBackground from "../MenuBackground/MenuBackground";
-import { useView, Views } from "../../contexts/ViewContext";
 import { useEffect, useState } from "react";
 import { useDb } from "../../contexts/DbContext";
+import { Views, useView } from "../../contexts/ViewContext";
+import MenuBackground from "../MenuBackground/MenuBackground";
 
 export default function Scoreboard() {
   const { setView } = useView();
   const { supabase, name } = useDb();
   const [scoreboard, setScoreboard] = useState<Record<number, score[]> | null>(
-    null
+    null,
   );
 
   const refreshScoreboard = () => {
@@ -29,7 +29,7 @@ export default function Scoreboard() {
               if (!acc[typeName]) acc[typeName] = [];
               acc[typeName].push(item);
               return acc;
-            }, {})
+            }, {}),
           );
         }
       });

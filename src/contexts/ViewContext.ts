@@ -10,7 +10,7 @@ export enum Views {
 }
 
 export const ViewContext = createContext<ViewContextValue | undefined>(
-  undefined
+  undefined,
 );
 
 export const useView = (): ViewContextValue => {

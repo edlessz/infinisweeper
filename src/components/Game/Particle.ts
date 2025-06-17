@@ -7,7 +7,7 @@ export default class Particle {
   constructor(
     public position: Vector2,
     public color: string,
-    public image: HTMLImageElement | null = null
+    public image: HTMLImageElement | null = null,
   ) {}
 
   public update(): void {
@@ -20,7 +20,7 @@ export default class Particle {
     ctx.save();
     ctx.translate(
       this.position.x + this.size.x / 2,
-      this.position.y + this.size.y / 2
+      this.position.y + this.size.y / 2,
     );
     ctx.rotate(this.angle);
     if (this.image) {
@@ -29,7 +29,7 @@ export default class Particle {
         -this.size.x / 2,
         -this.size.y / 2,
         this.size.x,
-        this.size.y
+        this.size.y,
       );
     } else {
       ctx.fillStyle = this.color;
@@ -37,7 +37,7 @@ export default class Particle {
         -this.size.x / 2,
         -this.size.y / 2,
         this.size.x,
-        this.size.y
+        this.size.y,
       );
     }
     ctx.restore();

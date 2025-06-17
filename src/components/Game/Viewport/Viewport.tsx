@@ -1,11 +1,11 @@
 import "./Viewport.css";
 import { useEffect, useRef, useState } from "react";
+import { useSettings } from "../../../contexts/SettingsContext";
 import type Game from "../Game";
 import type { GameStats } from "../Game";
-import subtexts from "../subtexts.json";
 import Menubar from "../Menubar/Menubar";
 import SweepedDialog from "../SweepedDialog/SweepedDialog";
-import { useSettings } from "../../../contexts/SettingsContext";
+import subtexts from "../subtexts.json";
 
 interface ViewportProps {
   game: Game;
@@ -53,7 +53,7 @@ export default function Viewport({ game, newGame }: ViewportProps) {
       randomizeSubtext: () => {
         const subtextsTyped: string[] = subtexts as string[];
         setSubtext(
-          subtextsTyped[Math.floor(Math.random() * subtextsTyped.length)]
+          subtextsTyped[Math.floor(Math.random() * subtextsTyped.length)],
         );
       },
     });

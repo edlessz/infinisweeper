@@ -1,10 +1,10 @@
 import "../../stylesheets/Menu.css";
 import "./MainMenu.css";
+import { LogIn, LogOut } from "lucide-react";
+import { useDb } from "../../contexts/DbContext";
+import { Views, useView } from "../../contexts/ViewContext";
 import Game from "../Game/Game";
 import MenuBackground from "../MenuBackground/MenuBackground";
-import { useDb } from "../../contexts/DbContext";
-import { LogIn, LogOut } from "lucide-react";
-import { useView, Views } from "../../contexts/ViewContext";
 
 interface MainMenuProps {
   newGame: () => void;

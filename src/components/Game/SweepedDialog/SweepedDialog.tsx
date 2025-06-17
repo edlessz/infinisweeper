@@ -1,10 +1,10 @@
 import "./SweepedDialog.css";
 import { CopyIcon } from "lucide-react";
-import { useView, Views } from "../../../contexts/ViewContext";
+import { useEffect, useState } from "react";
+import { useDb } from "../../../contexts/DbContext";
+import { Views, useView } from "../../../contexts/ViewContext";
 import Dialog from "../../Dialog/Dialog";
 import type { GameStats } from "../Game";
-import { useDb } from "../../../contexts/DbContext";
-import { useEffect, useState } from "react";
 
 interface SweepedDialogProps {
   dialogVisible: boolean;
@@ -34,14 +34,14 @@ export default function SweepedDialog({
         (n) =>
           ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"][
             Number.parseInt(n)
-          ]
+          ],
       )
       .join("");
     return `I just scored ${points} points in Infinisweeper! Can you beat me? ${window.location.href}`;
   };
   const getFacebookShareLink = () =>
     `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      window.location.href
+      window.location.href,
     )}&quote=${encodeURIComponent(getShareContent())}`;
   const getXShareLink = () =>
     `https://x.com/intent/tweet?text=${encodeURIComponent(getShareContent())}`;

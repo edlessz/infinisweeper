@@ -28,8 +28,8 @@ export default function Dialog({
     const stateClass = visible
       ? "visible"
       : isInitial
-      ? "hidden-initial"
-      : "hidden";
+        ? "hidden-initial"
+        : "hidden";
 
     dialog.classList.add(stateClass);
     visibleToggled.current++;

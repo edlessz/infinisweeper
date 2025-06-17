@@ -1,8 +1,8 @@
 import "../../stylesheets/Menu.css";
 import "./Changelog.css";
-import MenuBackground from "../MenuBackground/MenuBackground";
-import { useView, Views } from "../../contexts/ViewContext";
 import { useEffect, useState } from "react";
+import { Views, useView } from "../../contexts/ViewContext";
+import MenuBackground from "../MenuBackground/MenuBackground";
 
 export default function Changelog() {
   const { setView } = useView();

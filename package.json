@@ -10,7 +10,7 @@
     "preview": "pnpm vite preview",
     "write-cname": "node -e \"require('fs').writeFileSync('dist/CNAME', 'infinisweeper.net')\"",
     "deploy": "pnpm build && pnpm write-cname && pnpm gh-pages -d dist",
-    "check": "pnpm biome check --write **/*"
+    "check": "pnpm biome check --write src"
   },
   "dependencies": {
     "@capacitor/android": "^7.3.0",

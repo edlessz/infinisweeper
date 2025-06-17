@@ -1,14 +1,14 @@
 import { useState } from "react";
 import "./App.css";
+import Changelog from "./components/Changelog/Changelog";
 import { AudioManager } from "./components/Game/AudioManager";
 import Game, { type SaveData } from "./components/Game/Game";
 import { ImageManager } from "./components/Game/ImageManager";
 import Viewport from "./components/Game/Viewport/Viewport";
 import Menu from "./components/MainMenu/MainMenu";
-import { useView, Views } from "./contexts/ViewContext";
 import Scoreboard from "./components/Scoreboard/Scoreboard";
 import Settings from "./components/Settings/Settings";
-import Changelog from "./components/Changelog/Changelog";
+import { Views, useView } from "./contexts/ViewContext";
 
 const getSourceDictionary = (prefix: string, items: string[]) =>
   items.reduce<Record<string, string>>((acc, file) => {
@@ -23,7 +23,7 @@ ImageManager.loadImages(
     "flag_floor.png",
     "bomb.png",
     "shovel.png",
-  ])
+  ]),
 );
 AudioManager.loadAudios(
   getSourceDictionary("audio/", [
@@ -40,7 +40,7 @@ AudioManager.loadAudios(
     "blip_8.mp3",
     "charge.mp3",
     "confetti.mp3",
-  ])
+  ]),
 );
 
 export default function App() {
