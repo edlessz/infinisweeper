@@ -5,7 +5,7 @@ import Game, { SaveData } from "./components/Game/Game";
 import ImageManager from "./components/Game/ImageManager";
 import Viewport from "./components/Game/Viewport/Viewport";
 import Menu from "./components/MainMenu/MainMenu";
-import { useView, Views } from "./contexts/useView";
+import { useView, Views } from "./contexts/ViewContext";
 import Scoreboard from "./components/Scoreboard/Scoreboard";
 import Settings from "./components/Settings/Settings";
 import Changelog from "./components/Changelog/Changelog";

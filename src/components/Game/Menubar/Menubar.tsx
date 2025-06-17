@@ -1,6 +1,6 @@
 import "./Menubar.css";
 import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
-import { useView, Views } from "../../../contexts/useView";
+import { useView, Views } from "../../../contexts/ViewContext";
 import { useRef, useState } from "react";
 import Game, { GameStats } from "../Game";
 

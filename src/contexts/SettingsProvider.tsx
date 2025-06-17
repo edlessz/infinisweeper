@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SettingsContext } from "./useSettings";
+import { SettingsContext } from "./SettingsContext";
 
 interface SettingsProviderProps {
   children: React.ReactNode;

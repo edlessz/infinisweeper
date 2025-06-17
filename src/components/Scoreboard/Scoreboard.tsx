@@ -1,9 +1,9 @@
 import "../../stylesheets/Menu.css";
 import "./Scoreboard.css";
 import MenuBackground from "../MenuBackground/MenuBackground";
-import { useView, Views } from "../../contexts/useView";
+import { useView, Views } from "../../contexts/ViewContext";
 import { useEffect, useState } from "react";
-import { useDb } from "../../contexts/useDb";
+import { useDb } from "../../contexts/DbContext";
 
 export default function Scoreboard() {
   const { setView } = useView()!;

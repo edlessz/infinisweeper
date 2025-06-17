@@ -1,7 +1,7 @@
 import "../../stylesheets/Menu.css";
 import "./Changelog.css";
 import MenuBackground from "../MenuBackground/MenuBackground";
-import { useView, Views } from "../../contexts/useView";
+import { useView, Views } from "../../contexts/ViewContext";
 import { useEffect, useState } from "react";
 
 export default function Changelog() {

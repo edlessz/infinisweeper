@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, use } from "react";
 import { ViewContextValue } from "./ViewProvider";
 
 export enum Views {
@@ -13,4 +13,4 @@ export const ViewContext = createContext<ViewContextValue | undefined>(
   undefined,
 );
 
-export const useView = () => useContext(ViewContext);
+export const useView = () => use(ViewContext);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ViewContext, Views } from "./useView";
+import { ViewContext, Views } from "./ViewContext";
 
 interface ViewProviderProps {
   children: React.ReactNode;

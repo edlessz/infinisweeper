@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { Views } from "./contexts/useView.ts";
+import { Views } from "./contexts/ViewContext.ts";
 import { ViewProvider } from "./contexts/ViewProvider.tsx";
 import { DbProvider } from "./contexts/DbProvider.tsx";
 import { SettingsProvider } from "./contexts/SettingsProvider.tsx";

@@ -4,15 +4,18 @@
   "version": "3.0.1",
   "type": "module",
   "scripts": {
+    "build": "pnpm tsc -b && pnpm vite build && pnpm exec cap sync",
     "dev": "pnpx vite",
-    "build": "pnpm tsc -b && pnpm vite build",
-    "lint": "pnpm eslint .",
+    "dev:android": "pnpm exec cap sync android && pnpm exec cap run android",
     "preview": "pnpm vite preview",
-    "format": "pnpm prettier --write '**/*.{ts,tsx,css,html,json,md}'",
     "write-cname": "node -e \"require('fs').writeFileSync('dist/CNAME', 'infinisweeper.net')\"",
     "deploy": "pnpm build && pnpm write-cname && pnpm gh-pages -d dist"
   },
   "dependencies": {
+    "@capacitor/android": "^7.3.0",
+    "@capacitor/app": "^7.0.1",
+    "@capacitor/core": "^7.3.0",
+    "@capacitor/ios": "^7.3.0",
     "@supabase/supabase-js": "^2.49.8",
     "fast-simplex-noise": "^4.0.0",
     "lucide-react": "^0.510.0",
@@ -21,6 +24,7 @@
     "seedrandom": "^3.0.5"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.3.0",
     "@eslint/js": "^9.28.0",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",

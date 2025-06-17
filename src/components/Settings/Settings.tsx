@@ -1,10 +1,10 @@
 import "../../stylesheets/Menu.css";
 import "./Settings.css";
-import { useDb } from "../../contexts/useDb";
-import { useView, Views } from "../../contexts/useView";
+import { useDb } from "../../contexts/DbContext";
+import { useView, Views } from "../../contexts/ViewContext";
 import MenuBackground from "../MenuBackground/MenuBackground";
 import { useState } from "react";
-import { useSettings } from "../../contexts/useSettings";
+import { useSettings } from "../../contexts/SettingsContext";
 
 export default function Settings() {
   const { setView } = useView()!;

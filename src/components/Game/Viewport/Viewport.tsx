@@ -4,7 +4,7 @@ import Game, { GameStats } from "../Game";
 import subtexts from "../subtexts.json";
 import Menubar from "../Menubar/Menubar";
 import SweepedDialog from "../SweepedDialog/SweepedDialog";
-import { useSettings } from "../../../contexts/useSettings";
+import { useSettings } from "../../../contexts/SettingsContext";
 
 interface ViewportProps {
   game: Game;

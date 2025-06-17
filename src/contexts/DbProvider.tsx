@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { DbContext } from "./useDb";
+import { DbContext } from "./DbContext";
 import {
   createClient,
   Session,
   SupabaseClient,
   User,
 } from "@supabase/supabase-js";
+import { Capacitor, PluginListenerHandle } from "@capacitor/core";
+import { App } from "@capacitor/app";
 
 interface DbProviderProps {
   children: React.ReactNode;
@@ -24,6 +26,17 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+const options = Capacitor.isNativePlatform()
+  ? {
+      redirectTo: "infinisweeper://auth/callback",
+      queryParams: {
+        response_type: "token",
+      },
+    }
+  : {
+      redirectTo: window.location.origin,
+    };
 
 export const DbProvider = ({ children }: DbProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
@@ -44,20 +57,39 @@ export const DbProvider = ({ children }: DbProviderProps) => {
           supabase
             .from("names")
             .select("name")
-            .eq("uid", session?.user?.id)
+            .eq("uid", session.user.id)
             .single()
             .then(({ data, error }) => {
               if (error)
                 console.error("Error fetching user profile:", error.message);
               else setName(data?.name ?? null);
             });
-      },
+      }
     );
 
-    return () => {
-      listener?.subscription.unsubscribe();
+    let listenerHandle: PluginListenerHandle;
+    const setupListener = async () => {
+      listenerHandle = await App.addListener("appUrlOpen", async ({ url }) => {
+        if (!url.includes("#access_token=")) return;
+
+        const fragment = url.split("#")[1];
+        const params = new URLSearchParams(fragment);
+
+        const access_token = params.get("access_token") ?? "";
+        const refresh_token = params.get("refresh_token") ?? "";
+
+        if (access_token && refresh_token) {
+          await supabase.auth.setSession({ access_token, refresh_token });
+        }
+      });
     };
-  });
+    setupListener();
+
+    return () => {
+      listener.subscription.unsubscribe();
+      listenerHandle?.remove();
+    };
+  }, []);
 
   const value: DbContextValue = {
     user,
@@ -68,9 +100,10 @@ export const DbProvider = ({ children }: DbProviderProps) => {
       supabase.auth
         .signInWithOAuth({
           provider: "google",
-          options: {
-            redirectTo: window.location.origin,
-          },
+          options,
+        })
+        .then((data) => {
+          console.log("Sign in successful:", data);
         })
         .catch((error) => console.error("Error signing in:", error.message));
     },

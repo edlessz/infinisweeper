@@ -1,9 +1,9 @@
 import "./SweepedDialog.css";
 import { CopyIcon } from "lucide-react";
-import { useView, Views } from "../../../contexts/useView";
+import { useView, Views } from "../../../contexts/ViewContext";
 import Dialog from "../../Dialog/Dialog";
 import { GameStats } from "../Game";
-import { useDb } from "../../../contexts/useDb";
+import { useDb } from "../../../contexts/DbContext";
 import { useEffect, useState } from "react";
 
 interface SweepedDialogProps {

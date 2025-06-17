@@ -1,8 +1,8 @@
-import { createContext, useContext } from "react";
+import { createContext, use } from "react";
 import { SettingsContextValue } from "./SettingsProvider";
 
 export const SettingsContext = createContext<SettingsContextValue | undefined>(
   undefined,
 );
 
-export const useSettings = () => useContext(SettingsContext);
+export const useSettings = () => use(SettingsContext);
