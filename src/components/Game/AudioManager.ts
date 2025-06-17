@@ -1,47 +1,48 @@
-export default class AudioManager {
-  private static audioCtx = new AudioContext();
-  private static bufferCache: Record<string, AudioBuffer> = {};
-  private static masterGain = AudioManager.audioCtx.createGain();
-  private static activeSources: Record<string, Set<AudioBufferSourceNode>> = {};
-  private static maxInstancesPerSound = 3;
+const audioCtx = new AudioContext();
+const masterGain = audioCtx.createGain();
+masterGain.gain.value = 1.0;
+masterGain.connect(audioCtx.destination);
 
-  static {
-    this.masterGain.gain.value = 1.0;
-    this.masterGain.connect(this.audioCtx.destination);
-  }
+const bufferCache: Record<string, AudioBuffer> = {};
+const activeSources: Record<string, Set<AudioBufferSourceNode>> = {};
+let maxInstancesPerSound = 3;
 
-  public static async loadAudios(
-    audios: Record<string, string>,
-  ): Promise<void> {
+export const AudioManager = {
+  async loadAudios(audios: Record<string, string>): Promise<void> {
     for (const [name, path] of Object.entries(audios)) {
       const res = await fetch(path);
       const arrayBuffer = await res.arrayBuffer();
-      const audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
-      this.bufferCache[name] = audioBuffer;
-      this.activeSources[name] = new Set();
+      const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+      bufferCache[name] = audioBuffer;
+      activeSources[name] = new Set();
     }
-  }
+  },
 
-  public static play(name: string): void {
-    const buffer = this.bufferCache[name];
-    if (!buffer) return console.warn(`Audio "${name}" not loaded.`);
+  play(name: string): void {
+    const buffer = bufferCache[name];
+    if (!buffer) {
+      console.warn(`Audio "${name}" not loaded.`);
+      return;
+    }
 
-    const active = this.activeSources[name];
-    if (active.size >= this.maxInstancesPerSound) return;
+    const active = activeSources[name];
+    if (active.size >= maxInstancesPerSound) return;
 
-    const source = this.audioCtx.createBufferSource();
+    const source = audioCtx.createBufferSource();
     source.buffer = buffer;
-    source.connect(this.masterGain);
+    source.connect(masterGain);
     source.start();
 
     active.add(source);
-
     source.onended = () => active.delete(source);
-  }
+  },
 
-  public static setMaxInstances(name: string, max: number): void {
-    if (!this.activeSources[name]) this.activeSources[name] = new Set();
+  setMaxInstances(name: string, max: number): void {
+    if (!activeSources[name]) activeSources[name] = new Set();
+    maxInstancesPerSound = max;
+  },
 
-    this.maxInstancesPerSound = max;
-  }
-}
+  setVolume(volume: number): void {
+    masterGain.gain.value = volume;
+  },
+};

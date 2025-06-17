@@ -7,13 +7,13 @@ import { useState } from "react";
 import { useSettings } from "../../contexts/SettingsContext";
 
 export default function Settings() {
-  const { setView } = useView()!;
-  const { updateName, user, name } = useDb()!;
-  const { settings, saveSettings, settingsDescriptions } = useSettings()!;
+  const { setView } = useView();
+  const { updateName, user, name } = useDb();
+  const { settings, saveSettings, settingsDescriptions } = useSettings();
 
   const [nameField, setNameField] = useState<string>(name ?? "");
   const [localSettings, setLocalSettings] = useState(settings);
-  const setLocalSetting = (key: keyof typeof localSettings, value: any) => {
+  const setLocalSetting = (key: keyof typeof localSettings, value: boolean) => {
     setLocalSettings((prev) => {
       const newSettings = { ...prev, [key]: value };
       return newSettings;
@@ -25,7 +25,7 @@ export default function Settings() {
       await updateName(nameField);
       await saveSettings(localSettings);
       setView(Views.MENU);
-    } catch (error: any) {
+    } catch (error: unknown) {
       switch (error.code) {
         case "23505":
           alert("Display name already exists. Please choose another.");
@@ -36,7 +36,6 @@ export default function Settings() {
         default:
           alert("An unexpected error occurred. Please try again.");
       }
-      console.error(error);
     }
   };
   const discard = () => setView(Views.MENU);
@@ -55,8 +54,7 @@ export default function Settings() {
           onChange={(e) => setNameField(e.target.value)}
           disabled={!user}
           placeholder={user ? "Enter Display Name" : "Please Sign In!"}
-        ></input>
-
+        />
         <div>
           <span>Classic Background:</span>
           <div>{settingsDescriptions.classicBackground}</div>
@@ -67,8 +65,7 @@ export default function Settings() {
           onChange={(e) =>
             setLocalSetting("classicBackground", e.target.checked)
           }
-        ></input>
-
+        />
         <div>
           <span>Disable Borders:</span>
           <div>{settingsDescriptions.disableBorders}</div>
@@ -77,8 +74,7 @@ export default function Settings() {
           type="checkbox"
           checked={localSettings.disableBorders}
           onChange={(e) => setLocalSetting("disableBorders", e.target.checked)}
-        ></input>
-
+        />
         <div>
           <span>Disable Camera Shake:</span>
           <div>{settingsDescriptions.disableCameraShake}</div>
@@ -89,8 +85,7 @@ export default function Settings() {
           onChange={(e) =>
             setLocalSetting("disableCameraShake", e.target.checked)
           }
-        ></input>
-
+        />
         <div>
           <span>Disable Particles:</span>
           <div>{settingsDescriptions.disableParticles}</div>
@@ -101,11 +96,15 @@ export default function Settings() {
           onChange={(e) =>
             setLocalSetting("disableParticles", e.target.checked)
           }
-        ></input>
+        />
       </div>
       <div className="button-container">
-        <button onClick={save}>Save & Return</button>
-        <button onClick={discard}>Discard & Return</button>
+        <button type="button" onClick={save}>
+          Save & Return
+        </button>
+        <button type="button" onClick={discard}>
+          Discard & Return
+        </button>
       </div>
     </div>
   );

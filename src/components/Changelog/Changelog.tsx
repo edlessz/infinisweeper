@@ -5,7 +5,7 @@ import { useView, Views } from "../../contexts/ViewContext";
 import { useEffect, useState } from "react";
 
 export default function Changelog() {
-  const { setView } = useView()!;
+  const { setView } = useView();
   const [changelog, setChangelog] = useState<Changelog[] | null>(null);
 
   const refreshChangelog = () => {
@@ -30,8 +30,8 @@ export default function Changelog() {
                 <span>{entry.date}</span>
               </summary>
               <ul>
-                {entry.changes.map((change, index) => (
-                  <li key={index}>{change}</li>
+                {entry.changes.map((change) => (
+                  <li key={change}>{change}</li>
                 ))}
               </ul>
             </details>
@@ -41,7 +41,9 @@ export default function Changelog() {
         )}
       </div>
       <div className="button-container">
-        <button onClick={() => setView(Views.MENU)}>Back</button>
+        <button type="button" onClick={() => setView(Views.MENU)}>
+          Back
+        </button>
       </div>
     </div>
   );

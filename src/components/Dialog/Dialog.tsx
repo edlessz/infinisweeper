@@ -28,15 +28,15 @@ export default function Dialog({
     const stateClass = visible
       ? "visible"
       : isInitial
-        ? "hidden-initial"
-        : "hidden";
+      ? "hidden-initial"
+      : "hidden";
 
     dialog.classList.add(stateClass);
     visibleToggled.current++;
   }, [visible]);
 
   return (
-    <div ref={dialogRef} className={"Dialog " + className}>
+    <div ref={dialogRef} className={`Dialog ${className}`}>
       {title && <h2 className="Header">{title}</h2>}
       {children}
     </div>

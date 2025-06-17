@@ -2,7 +2,7 @@ import "./SweepedDialog.css";
 import { CopyIcon } from "lucide-react";
 import { useView, Views } from "../../../contexts/ViewContext";
 import Dialog from "../../Dialog/Dialog";
-import { GameStats } from "../Game";
+import type { GameStats } from "../Game";
 import { useDb } from "../../../contexts/DbContext";
 import { useEffect, useState } from "react";
 
@@ -18,8 +18,8 @@ export default function SweepedDialog({
   stats,
   newGame,
 }: SweepedDialogProps) {
-  const { setView } = useView()!;
-  const { supabase, user } = useDb()!;
+  const { setView } = useView();
+  const { supabase, user } = useDb();
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
 
   useEffect(() => {
@@ -33,14 +33,16 @@ export default function SweepedDialog({
       .map(
         (n) =>
           ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"][
-            parseInt(n)
-          ],
+            Number.parseInt(n)
+          ]
       )
       .join("");
     return `I just scored ${points} points in Infinisweeper! Can you beat me? ${window.location.href}`;
   };
   const getFacebookShareLink = () =>
-    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(getShareContent())}`;
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      window.location.href
+    )}&quote=${encodeURIComponent(getShareContent())}`;
   const getXShareLink = () =>
     `https://x.com/intent/tweet?text=${encodeURIComponent(getShareContent())}`;
   const copyShare = () => {
@@ -102,19 +104,29 @@ export default function SweepedDialog({
               alt="Share on X"
             />
           </a>
-          <CopyIcon width={32} height={32} onClick={copyShare}></CopyIcon>
+          <CopyIcon width={32} height={32} onClick={copyShare} />
         </div>
       </div>
       <div className="button-container">
-        <button disabled={!user || scoreSubmitted} onClick={submitScore}>
+        <button
+          type="button"
+          disabled={!user || scoreSubmitted}
+          onClick={submitScore}
+        >
           {user
             ? scoreSubmitted
               ? "Score Submitted!"
               : "Submit Score"
             : "Login to Submit Score!"}
         </button>
-        {newGame && <button onClick={newGame}>New Game</button>}
-        <button onClick={() => setView(Views.MENU)}>Main Menu</button>
+        {newGame && (
+          <button type="button" onClick={newGame}>
+            New Game
+          </button>
+        )}
+        <button type="button" onClick={() => setView(Views.MENU)}>
+          Main Menu
+        </button>
       </div>
     </Dialog>
   );

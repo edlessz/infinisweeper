@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { DbContext } from "./DbContext";
 import {
   createClient,
-  Session,
-  SupabaseClient,
-  User,
+  type Session,
+  type SupabaseClient,
+  type User,
 } from "@supabase/supabase-js";
-import { Capacitor, PluginListenerHandle } from "@capacitor/core";
+import { Capacitor, type PluginListenerHandle } from "@capacitor/core";
 import { App } from "@capacitor/app";
 
 interface DbProviderProps {

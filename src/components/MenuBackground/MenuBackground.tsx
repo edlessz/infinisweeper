@@ -1,11 +1,11 @@
 import "./MenuBackground.css";
 import { useEffect, useRef } from "react";
 import { makeNoise2D } from "fast-simplex-noise";
-import ImageManager from "../Game/ImageManager";
+import { ImageManager } from "../Game/ImageManager";
 import { useSettings } from "../../contexts/SettingsContext";
 
 export default function MenuBackground() {
-  const { settings } = useSettings()!;
+  const { settings } = useSettings();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const noise = useRef(makeNoise2D(() => Math.random()));
@@ -82,5 +82,5 @@ export default function MenuBackground() {
     };
   }, []);
 
-  return <canvas ref={canvasRef}></canvas>;
+  return <canvas ref={canvasRef} />;
 }

@@ -1,6 +1,6 @@
-import ImageManager from "./ImageManager";
+import { ImageManager } from "./ImageManager";
 import Particle from "./Particle";
-import Vector2 from "./Vector2";
+import type Vector2 from "./Vector2";
 
 export default class ParticleManager {
   private entities: {
@@ -17,17 +17,17 @@ export default class ParticleManager {
 
   public update(): void {
     this.entities = this.entities.filter(
-      (entity) => entity.deathTime > performance.now(),
+      (entity) => entity.deathTime > performance.now()
     );
-    this.entities.forEach((entity) => {
+    for (const entity of this.entities) {
       entity.particle.update();
-    });
+    }
   }
 
   public render(ctx: CanvasRenderingContext2D): void {
-    this.entities.forEach((entity) => {
+    for (const entity of this.entities) {
       entity.particle.render(ctx);
-    });
+    }
   }
 
   public clear(): void {
@@ -40,7 +40,7 @@ export default class ParticleManager {
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
       const particle = new Particle(
         { x: x + Math.random(), y: y + Math.random() },
-        randomColor,
+        randomColor
       );
 
       const size = Math.random() * 0.25 + 0.25; // Random size between 0.25 and 0.5

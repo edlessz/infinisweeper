@@ -1,8 +1,8 @@
-import Vector2 from "./Vector2";
+import type Vector2 from "./Vector2";
 
 export default class Camera {
   public position: Vector2 = { x: 0, y: 0 };
-  public ppu: number = 32;
+  public ppu = 32;
 
   public readonly ppuBounds = {
     min: 16,
@@ -37,7 +37,7 @@ export default class Camera {
     this.ppu += amount;
     this.ppu = Math.max(
       this.ppuBounds.min,
-      Math.min(this.ppu, this.ppuBounds.max),
+      Math.min(this.ppu, this.ppuBounds.max)
     );
 
     const worldAfter = this.toWorldSpace(position);

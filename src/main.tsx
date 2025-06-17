@@ -7,7 +7,12 @@ import { ViewProvider } from "./contexts/ViewProvider.tsx";
 import { DbProvider } from "./contexts/DbProvider.tsx";
 import { SettingsProvider } from "./contexts/SettingsProvider.tsx";
 
-createRoot(document.getElementById("root")!).render(
+const root = document.getElementById("root");
+if (!root) {
+  throw new Error("Root element not found");
+}
+
+createRoot(root).render(
   <StrictMode>
     <DbProvider>
       <ViewProvider defaultView={Views.MENU}>
@@ -16,5 +21,5 @@ createRoot(document.getElementById("root")!).render(
         </SettingsProvider>
       </ViewProvider>
     </DbProvider>
-  </StrictMode>,
+  </StrictMode>
 );

@@ -1,7 +1,7 @@
-import { Settings } from "../../contexts/SettingsProvider";
+import type { Settings } from "../../contexts/SettingsProvider";
 import Board from "./Board";
 import Camera from "./Camera";
-import Vector2 from "./Vector2";
+import type Vector2 from "./Vector2";
 
 export interface SaveData {
   seed: number;
@@ -36,7 +36,7 @@ export default class Game {
     x: 0,
     y: 0,
   };
-  public gameStarted: boolean = false;
+  public gameStarted = false;
 
   public static savedGameKey = "infinisweeper.saved-game";
 
@@ -95,7 +95,7 @@ export default class Game {
           window.removeEventListener("mousemove", mouseMove);
           if (!mouseMoved) this.mouseClick(mouseUpEvent);
         },
-        { once: true },
+        { once: true }
       );
     } else {
       if (event.touches.length !== 1) return;
@@ -139,7 +139,7 @@ export default class Game {
   };
   public mouseClick = (
     event: MouseEvent | TouchEvent,
-    hold?: boolean,
+    hold?: boolean
   ): void => {
     event.preventDefault();
     if (!this.hooks?.getGameActive()) return;
@@ -158,12 +158,16 @@ export default class Game {
 
     const doClick = (eventButton: number, mouse: Vector2) => {
       switch (eventButton) {
-        case 0:
+        case 0: {
           if (!this.gameStarted) this.findFirstClick(mouse);
-          mouse = this.camera.toWorldSpace(screenSpace);
-          this.Board.attemptReveal([Math.floor(mouse.x), Math.floor(mouse.y)]);
+          const worldSpaceMouse = this.camera.toWorldSpace(screenSpace);
+          this.Board.attemptReveal([
+            Math.floor(worldSpaceMouse.x),
+            Math.floor(worldSpaceMouse.y),
+          ]);
           this.gameStarted = true;
           break;
+        }
         case 2:
           if (this.gameStarted)
             this.Board.toggleFlag([Math.floor(mouse.x), Math.floor(mouse.y)]);
@@ -186,7 +190,7 @@ export default class Game {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
       },
-      event.deltaY < 0 ? 1 : -1,
+      event.deltaY < 0 ? 1 : -1
     );
   };
   public pinchZoom = (event: TouchEvent): void => {
@@ -197,7 +201,7 @@ export default class Game {
     const dist = (touch1: Touch, touch2: Touch): number => {
       return Math.sqrt(
         (touch1.clientX - touch2.clientX) ** 2 +
-          (touch1.clientY - touch2.clientY) ** 2,
+          (touch1.clientY - touch2.clientY) ** 2
       );
     };
     let initialDistance = dist(touch1, touch2);
@@ -222,7 +226,7 @@ export default class Game {
     window.addEventListener(
       "touchend",
       () => window.removeEventListener("touchmove", touchMove),
-      { once: true },
+      { once: true }
     );
   };
   public zoom = (amt: number): void => {
@@ -233,7 +237,7 @@ export default class Game {
         x: this.canvas.width / 2,
         y: this.canvas.height / 2,
       },
-      amt,
+      amt
     );
   };
 
@@ -244,7 +248,7 @@ export default class Game {
 
   public findFirstClick(mouse: Vector2): void {
     const firstZero = this.Board.getFirstZero(
-      (Math.floor(mouse.x) + Math.floor(mouse.y)) % 2,
+      (Math.floor(mouse.x) + Math.floor(mouse.y)) % 2
     );
     if (firstZero) {
       const tileOffset = {

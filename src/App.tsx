@@ -1,8 +1,8 @@
 import { useState } from "react";
 import "./App.css";
-import AudioManager from "./components/Game/AudioManager";
-import Game, { SaveData } from "./components/Game/Game";
-import ImageManager from "./components/Game/ImageManager";
+import { AudioManager } from "./components/Game/AudioManager";
+import Game, { type SaveData } from "./components/Game/Game";
+import { ImageManager } from "./components/Game/ImageManager";
 import Viewport from "./components/Game/Viewport/Viewport";
 import Menu from "./components/MainMenu/MainMenu";
 import { useView, Views } from "./contexts/ViewContext";
@@ -23,7 +23,7 @@ ImageManager.loadImages(
     "flag_floor.png",
     "bomb.png",
     "shovel.png",
-  ]),
+  ])
 );
 AudioManager.loadAudios(
   getSourceDictionary("audio/", [
@@ -40,11 +40,11 @@ AudioManager.loadAudios(
     "blip_8.mp3",
     "charge.mp3",
     "confetti.mp3",
-  ]),
+  ])
 );
 
 export default function App() {
-  const { view, setView } = useView()!;
+  const { view, setView } = useView();
   const [game, setGame] = useState<Game | null>(null);
 
   const newGame = (): void => {
@@ -64,9 +64,6 @@ export default function App() {
   };
 
   switch (view) {
-    default:
-    case Views.MENU:
-      return <Menu newGame={newGame} continueGame={continueGame} />;
     case Views.GAME:
       return game ? (
         <Viewport game={game} newGame={newGame} />
@@ -79,5 +76,7 @@ export default function App() {
       return <Settings />;
     case Views.CHANGELOG:
       return <Changelog />;
+    default:
+      return <Menu newGame={newGame} continueGame={continueGame} />;
   }
 }

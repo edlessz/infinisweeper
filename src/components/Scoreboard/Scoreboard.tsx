@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { useDb } from "../../contexts/DbContext";
 
 export default function Scoreboard() {
-  const { setView } = useView()!;
-  const { supabase, name } = useDb()!;
+  const { setView } = useView();
+  const { supabase, name } = useDb();
   const [scoreboard, setScoreboard] = useState<Record<number, score[]> | null>(
-    null,
+    null
   );
 
   const refreshScoreboard = () => {
@@ -24,12 +24,12 @@ export default function Scoreboard() {
           setScoreboard(null);
         } else {
           setScoreboard(
-            data.reduce<Record<string, any[]>>((acc, item) => {
+            data.reduce<Record<string, score[]>>((acc, item) => {
               const typeName = item.game_type;
               if (!acc[typeName]) acc[typeName] = [];
               acc[typeName].push(item);
               return acc;
-            }, {}),
+            }, {})
           );
         }
       });
@@ -51,7 +51,7 @@ export default function Scoreboard() {
               <tbody>
                 {scores.map((score, index) => (
                   <tr
-                    key={index}
+                    key={null}
                     style={{
                       fontWeight: score.name === name ? "bold" : "normal",
                     }}

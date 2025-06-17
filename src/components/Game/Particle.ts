@@ -1,13 +1,13 @@
-import Vector2 from "./Vector2";
+import type Vector2 from "./Vector2";
 
 export default class Particle {
   public velocity: Vector2 = { x: (Math.random() * 2 - 1) / 20, y: 0 };
   public size: Vector2 = { x: 1, y: 1 };
-  private angle: number = 0;
+  private angle = 0;
   constructor(
     public position: Vector2,
     public color: string,
-    public image: HTMLImageElement | null = null,
+    public image: HTMLImageElement | null = null
   ) {}
 
   public update(): void {
@@ -20,7 +20,7 @@ export default class Particle {
     ctx.save();
     ctx.translate(
       this.position.x + this.size.x / 2,
-      this.position.y + this.size.y / 2,
+      this.position.y + this.size.y / 2
     );
     ctx.rotate(this.angle);
     if (this.image) {
@@ -29,7 +29,7 @@ export default class Particle {
         -this.size.x / 2,
         -this.size.y / 2,
         this.size.x,
-        this.size.y,
+        this.size.y
       );
     } else {
       ctx.fillStyle = this.color;
@@ -37,7 +37,7 @@ export default class Particle {
         -this.size.x / 2,
         -this.size.y / 2,
         this.size.x,
-        this.size.y,
+        this.size.y
       );
     }
     ctx.restore();

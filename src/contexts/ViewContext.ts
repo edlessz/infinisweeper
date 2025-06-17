@@ -1,5 +1,5 @@
 import { createContext, use } from "react";
-import { ViewContextValue } from "./ViewProvider";
+import type { ViewContextValue } from "./ViewProvider";
 
 export enum Views {
   MENU = "menu",
@@ -10,7 +10,11 @@ export enum Views {
 }
 
 export const ViewContext = createContext<ViewContextValue | undefined>(
-  undefined,
+  undefined
 );
 
-export const useView = () => use(ViewContext);
+export const useView = (): ViewContextValue => {
+  const context = use(ViewContext);
+  if (!context) throw new Error("useView must be used within a ViewProvider");
+  return context;
+};

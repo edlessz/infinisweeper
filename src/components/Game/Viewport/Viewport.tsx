@@ -1,6 +1,7 @@
 import "./Viewport.css";
 import { useEffect, useRef, useState } from "react";
-import Game, { GameStats } from "../Game";
+import type Game from "../Game";
+import type { GameStats } from "../Game";
 import subtexts from "../subtexts.json";
 import Menubar from "../Menubar/Menubar";
 import SweepedDialog from "../SweepedDialog/SweepedDialog";
@@ -14,7 +15,7 @@ interface ViewportProps {
 export default function Viewport({ game, newGame }: ViewportProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [subtext, setSubtext] = useState("");
-  const { settings } = useSettings()!;
+  const { settings } = useSettings();
 
   const [stats, setStats] = useState<GameStats>({
     flags: 0,
@@ -36,8 +37,8 @@ export default function Viewport({ game, newGame }: ViewportProps) {
   }, [dialogVisible]);
 
   useEffect(() => {
-    const canvas = canvasRef.current!;
-    const viewport = canvas.parentElement!;
+    const canvas = canvasRef.current;
+    const viewport = canvas?.parentElement ?? null;
 
     game.canvas = canvas;
     game.addEventListeners();
@@ -52,7 +53,7 @@ export default function Viewport({ game, newGame }: ViewportProps) {
       randomizeSubtext: () => {
         const subtextsTyped: string[] = subtexts as string[];
         setSubtext(
-          subtextsTyped[Math.floor(Math.random() * subtextsTyped.length)],
+          subtextsTyped[Math.floor(Math.random() * subtextsTyped.length)]
         );
       },
     });
@@ -61,6 +62,8 @@ export default function Viewport({ game, newGame }: ViewportProps) {
     setGameActive(true);
 
     const resize = () => {
+      if (!viewport || !canvas) return;
+
       const { width, height } = viewport.getBoundingClientRect();
       canvas.width = width;
       canvas.height = height;
@@ -70,7 +73,7 @@ export default function Viewport({ game, newGame }: ViewportProps) {
     window.addEventListener("resize", resize);
     resize();
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas?.getContext("2d") ?? null;
     if (!ctx) throw new Error("Failed to get canvas context.");
 
     // Main loop
@@ -88,7 +91,7 @@ export default function Viewport({ game, newGame }: ViewportProps) {
       }
 
       ctx.resetTransform();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas?.width ?? 0, canvas?.height ?? 0);
       game.render(ctx);
 
       renderId = requestAnimationFrame(render);
@@ -106,7 +109,7 @@ export default function Viewport({ game, newGame }: ViewportProps) {
 
   return (
     <div className="Viewport">
-      <canvas ref={canvasRef}></canvas>
+      <canvas ref={canvasRef} />
       <Menubar gameActive={gameActive} game={game} stats={stats} />
       <SweepedDialog
         dialogVisible={dialogVisible}

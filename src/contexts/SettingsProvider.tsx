@@ -20,9 +20,9 @@ export const SettingsProvider = ({ children }: SettingsProviderProps) => {
 
   const saveSettings = (settings: Settings) => {
     setSettings(settings);
-    Object.entries(settings).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(settings)) {
       localStorage.setItem(key, String(value));
-    });
+    }
   };
 
   return (

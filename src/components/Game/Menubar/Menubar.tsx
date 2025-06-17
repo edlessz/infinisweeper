@@ -2,7 +2,7 @@ import "./Menubar.css";
 import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { useView, Views } from "../../../contexts/ViewContext";
 import { useRef, useState } from "react";
-import Game, { GameStats } from "../Game";
+import Game, { type GameStats } from "../Game";
 
 interface MenubarProps {
   game: Game;
@@ -11,7 +11,7 @@ interface MenubarProps {
 }
 
 export default function Menubar({ gameActive, game, stats }: MenubarProps) {
-  const { setView } = useView()!;
+  const { setView } = useView();
   const [saveText, setSaveText] = useState("");
 
   const saveTextTimeout = useRef<number | null>(null);
@@ -45,10 +45,15 @@ export default function Menubar({ gameActive, game, stats }: MenubarProps) {
   return (
     <div className="Menubar">
       <div>
-        <button className="circle-btn" onClick={() => setView(Views.MENU)}>
+        <button
+          type="button"
+          className="circle-btn"
+          onClick={() => setView(Views.MENU)}
+        >
           <Home />
         </button>
         <button
+          type="button"
           className="circle-btn"
           onClick={() => gameActive && saveGame()}
           disabled={!gameActive}
@@ -59,17 +64,25 @@ export default function Menubar({ gameActive, game, stats }: MenubarProps) {
       </div>
       <div>
         <span className="stat">
-          <img src="./images/shovel.png"></img> {stats.revealed}
+          <img src="./images/shovel.png" alt="Tiles Dug" /> {stats.revealed}
         </span>
         <span className="stat">
-          <img src="./images/flag.png"></img> {stats.flags}
+          <img src="./images/flag.png" alt="Flags" /> {stats.flags}
         </span>
       </div>
       <div>
-        <button className="circle-btn" onClick={() => game.zoom(1)}>
+        <button
+          type="button"
+          className="circle-btn"
+          onClick={() => game.zoom(1)}
+        >
           <ZoomInIcon />
         </button>
-        <button className="circle-btn" onClick={() => game.zoom(-1)}>
+        <button
+          type="button"
+          className="circle-btn"
+          onClick={() => game.zoom(-1)}
+        >
           <ZoomOutIcon />
         </button>
       </div>
