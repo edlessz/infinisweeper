@@ -1,38 +1,37 @@
 {
-  "name": "infinisweeper",
-  "private": true,
-  "version": "3.0.1",
-  "type": "module",
-  "scripts": {
-    "build": "pnpm tsc -b && pnpm vite build && pnpm exec cap sync",
-    "dev": "pnpx vite",
-    "dev:android": "pnpm exec cap sync android && pnpm exec cap run android",
-    "preview": "pnpm vite preview",
-    "write-cname": "node -e \"require('fs').writeFileSync('dist/CNAME', 'infinisweeper.net')\"",
-    "deploy": "pnpm build && pnpm write-cname && pnpm gh-pages -d dist",
-    "check": "pnpm biome check --write src"
-  },
-  "dependencies": {
-    "@capacitor/android": "^7.3.0",
-    "@capacitor/app": "^7.0.1",
-    "@capacitor/core": "^7.3.0",
-    "@capacitor/ios": "^7.3.0",
-    "@supabase/supabase-js": "^2.49.8",
-    "fast-simplex-noise": "^4.0.0",
-    "lucide-react": "^0.510.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "seedrandom": "^3.0.5"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@capacitor/cli": "^7.3.0",
-    "@types/react": "^19.1.6",
-    "@types/react-dom": "^19.1.5",
-    "@types/seedrandom": "^3.0.8",
-    "@vitejs/plugin-react": "^4.5.0",
-    "gh-pages": "^6.3.0",
-    "typescript": "~5.7.3",
-    "vite": "^6.3.5"
-  }
+	"name": "infinisweeper",
+	"private": true,
+	"version": "3.0.1",
+	"type": "module",
+	"scripts": {
+		"build": "bunx tsc -b && bunx vite build && bunx cap sync",
+		"dev": "bunx vite",
+		"dev:android": "bunx cap sync android && bunx cap run android",
+		"preview": "bunx vite preview",
+		"write-cname": "node -e \"require('fs').writeFileSync('dist/CNAME', 'infinisweeper.net')\"",
+		"deploy": "bun run build && bun run write-cname && bunx gh-pages -d dist",
+		"check": "bunx biome check --write"
+	},
+	"dependencies": {
+		"@capacitor/android": "^7.4.4",
+		"@capacitor/app": "^7.1.1",
+		"@capacitor/core": "^7.4.4",
+		"@capacitor/ios": "^7.4.4",
+		"fast-simplex-noise": "^4.0.0",
+		"lucide-react": "^0.510.0",
+		"react": "^19.2.3",
+		"react-dom": "^19.2.3",
+		"seedrandom": "^3.0.5"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.10",
+		"@capacitor/cli": "^7.4.4",
+		"@types/react": "^19.2.7",
+		"@types/react-dom": "^19.2.3",
+		"@types/seedrandom": "^3.0.8",
+		"@vitejs/plugin-react": "^4.7.0",
+		"gh-pages": "^6.3.0",
+		"typescript": "~5.7.3",
+		"vite": "^6.4.1"
+	}
 }
