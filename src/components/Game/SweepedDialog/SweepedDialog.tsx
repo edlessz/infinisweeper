@@ -1,8 +1,10 @@
 import "./SweepedDialog.css";
+import { Timestamp, doc, getDoc, setDoc } from "firebase/firestore";
 import { CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDb } from "../../../contexts/DbContext";
 import { Views, useView } from "../../../contexts/ViewContext";
+import { db } from "../../../lib/firebase";
 import Dialog from "../../Dialog/Dialog";
 import type { GameStats } from "../Game";
 
@@ -19,12 +21,37 @@ export default function SweepedDialog({
   newGame,
 }: SweepedDialogProps) {
   const { setView } = useView();
-  const { supabase, user } = useDb();
+  const { user, name } = useDb();
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
+  const [highScore, setHighScore] = useState<number | null>(null);
+  const [loadingHighScore, setLoadingHighScore] = useState(false);
 
   useEffect(() => {
     setScoreSubmitted(false);
-  }, [dialogVisible]);
+    setHighScore(null);
+
+    // Fetch the user's high score when dialog opens
+    const fetchHighScore = async () => {
+      if (!user || !dialogVisible) return;
+
+      setLoadingHighScore(true);
+      try {
+        const scoreDocId = `${user.uid}_classic`;
+        const scoreDocRef = doc(db, "scores", scoreDocId);
+        const scoreDoc = await getDoc(scoreDocRef);
+
+        if (scoreDoc.exists()) {
+          setHighScore(scoreDoc.data().score);
+        }
+      } catch (error) {
+        console.error("Error fetching high score:", error);
+      } finally {
+        setLoadingHighScore(false);
+      }
+    };
+
+    fetchHighScore();
+  }, [dialogVisible, user]);
 
   const getShareContent = (): string => {
     const points = stats.revealed
@@ -57,23 +84,31 @@ export default function SweepedDialog({
         console.error("Failed to copy share content:", err);
       });
   };
-  const submitScore = () => {
-    if (!user || scoreSubmitted) return;
+  const submitScore = async () => {
+    if (!user || !name || scoreSubmitted) return;
     setScoreSubmitted(true);
-    supabase
-      .from("scores")
-      .insert({
+
+    try {
+      const scoreDocId = `${user.uid}_classic`;
+      const scoreDocRef = doc(db, "scores", scoreDocId);
+
+      // Submit the new high score
+      await setDoc(scoreDocRef, {
         score: stats.revealed,
-        game_type_id: 0,
-      })
-      .then(({ error }) => {
-        if (error) {
-          alert("Failed to submit score.");
-          console.error("Error submitting score:", error);
-          setScoreSubmitted(false);
-        } else setScoreSubmitted(true);
+        username: name,
+        updatedAt: Timestamp.now(),
       });
+
+      setScoreSubmitted(true);
+    } catch (error) {
+      alert("Failed to submit score.");
+      console.error("Error submitting score:", error);
+      setScoreSubmitted(false);
+    }
   };
+
+  const isNewHighScore = highScore === null || stats.revealed > highScore;
+  const canSubmitScore = user && !scoreSubmitted && isNewHighScore;
 
   return (
     <Dialog visible={dialogVisible} className="SweepedDialog">
@@ -83,6 +118,7 @@ export default function SweepedDialog({
       </div>
       <div>
         <span className="score">{stats.revealed} Points</span>
+
         <div className="share-buttons">
           <a
             href={getFacebookShareLink()}
@@ -110,14 +146,18 @@ export default function SweepedDialog({
       <div className="button-container">
         <button
           type="button"
-          disabled={!user || scoreSubmitted}
+          disabled={!canSubmitScore || loadingHighScore}
           onClick={submitScore}
         >
-          {user
-            ? scoreSubmitted
-              ? "Score Submitted!"
-              : "Submit Score"
-            : "Login to Submit Score!"}
+          {!user
+            ? "Login to Submit Score!"
+            : loadingHighScore
+              ? "Loading..."
+              : scoreSubmitted
+                ? "Score Submitted!"
+                : !isNewHighScore
+                  ? `High Score: ${highScore ?? 0}`
+                  : "Submit Score"}
         </button>
         {newGame && (
           <button type="button" onClick={newGame}>

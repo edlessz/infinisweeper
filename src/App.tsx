@@ -55,10 +55,9 @@ export default function App() {
     const savedGame: SaveData | undefined =
       JSON.parse(localStorage.getItem(Game.savedGameKey) ?? "null") ??
       undefined;
-    if (!savedGame) {
-      console.error("No saved game found.");
+    if (!savedGame)
       return;
-    }
+    
     setGame(new Game(savedGame));
     setView(Views.GAME);
   };
