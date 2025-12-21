@@ -1,6 +1,13 @@
 import "../../stylesheets/Menu.css";
 import "./Scoreboard.css";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useDb } from "../../contexts/DbContext";
 import { Views, useView } from "../../contexts/ViewContext";
@@ -16,27 +23,30 @@ export default function Scoreboard() {
 
   const refreshScoreboard = async () => {
     try {
-      const scoresRef = collection(db, "scores");
-      const q = query(scoresRef, orderBy("score", "desc"));
-      const querySnapshot = await getDocs(q);
+      const modes = [
+        { id: "classic", label: "Classic" },
+        // { id: "timeAttack", label: "Time Attack" }, // Future mode
+      ];
 
       const scoresByMode: Record<string, score[]> = {};
 
-      for (const docSnap of querySnapshot.docs) {
-        const data = docSnap.data();
-        // Extract mode from document ID (format: UID_modename)
-        const mode = docSnap.id.split("_")[1] || "classic";
+      await Promise.all(
+        modes.map(async ({ id, label }) => {
+          const q = query(
+            collection(db, "scores"),
+            where("mode", "==", id),
+            orderBy("score", "desc"),
+            limit(10)
+          );
+          const querySnapshot = await getDocs(q);
 
-        if (!scoresByMode[mode]) {
-          scoresByMode[mode] = [];
-        }
-
-        scoresByMode[mode].push({
-          name: data.username,
-          score: data.score,
-          game_type: mode,
-        });
-      }
+          scoresByMode[label] = querySnapshot.docs.map((doc) => ({
+            name: doc.data().username,
+            score: doc.data().score,
+            game_type: label,
+          }));
+        })
+      );
 
       setScoreboard(scoresByMode);
     } catch (error) {
@@ -55,9 +65,9 @@ export default function Scoreboard() {
       <h1>Scoreboard</h1>
       <div className="table">
         {scoreboard === null && <span>Loading...</span>}
-        {Object.entries(scoreboard || {}).map(([gameTypeId, scores]) => (
-          <div key={gameTypeId} className="scoreboard-table">
-            <div className="header">{gameTypeId} Mode</div>
+        {Object.entries(scoreboard || {}).map(([gameType, scores]) => (
+          <div key={gameType} className="scoreboard-table">
+            <div className="header">{gameType} Mode</div>
             <table>
               <tbody>
                 {scores.map((score, index) => (
