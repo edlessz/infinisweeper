@@ -1,4 +1,4 @@
-import type Vector2 from "./Vector2";
+import type { Vector2 } from "@/lib/utils";
 
 export default class Camera {
 	public position: Vector2 = { x: 0, y: 0 };

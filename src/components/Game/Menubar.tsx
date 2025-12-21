@@ -1,8 +1,7 @@
-import "./Menubar.css";
+import { useNavigate } from "@tanstack/react-router";
 import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { useRef, useState } from "react";
-import { useView, Views } from "../../../contexts/ViewContext";
-import Game, { type GameStats } from "../Game";
+import Game, { type GameStats } from "./Game";
 
 interface MenubarProps {
 	game: Game;
@@ -11,8 +10,10 @@ interface MenubarProps {
 }
 
 export default function Menubar({ gameActive, game, stats }: MenubarProps) {
-	const { setView } = useView();
+	const navigate = useNavigate();
 	const [saveText, setSaveText] = useState("");
+
+	const fadeOutClass = "animate-[fadeOut_2s_ease-in-out_forwards]";
 
 	const saveTextTimeout = useRef<number | null>(null);
 	const saveTextRef = useRef<HTMLSpanElement>(null);
@@ -27,11 +28,11 @@ export default function Menubar({ gameActive, game, stats }: MenubarProps) {
 		}
 
 		if (saveTextRef.current) {
-			saveTextRef.current.classList.remove("fade-out");
+			saveTextRef.current.classList.remove(fadeOutClass);
 
 			requestAnimationFrame(() => {
 				void saveTextRef.current?.offsetWidth; // Trigger reflow
-				saveTextRef.current?.classList.add("fade-out");
+				saveTextRef.current?.classList.add(fadeOutClass);
 			});
 		}
 
@@ -43,12 +44,12 @@ export default function Menubar({ gameActive, game, stats }: MenubarProps) {
 	};
 
 	return (
-		<div className="Menubar">
-			<div>
+		<div className="absolute bottom-0 left-0 w-full p-4 bg-[rgba(255, 255, 255, 0.75)] flex items-center gap-2">
+			<div className="flex-1 flex gap-2 items-center justify-start">
 				<button
 					type="button"
 					className="circle-btn"
-					onClick={() => setView(Views.MENU)}
+					onClick={() => navigate({ to: "/" })}
 				>
 					<Home />
 				</button>
@@ -62,15 +63,25 @@ export default function Menubar({ gameActive, game, stats }: MenubarProps) {
 				</button>
 				<span ref={saveTextRef}>{saveText}</span>
 			</div>
-			<div>
-				<span className="stat">
-					<img src="./images/shovel.png" alt="Tiles Dug" /> {stats.revealed}
+			<div className="flex-1 flex gap-2 items-center justify-center">
+				<span className="flex items-center gap-2 font-bold">
+					<img
+						src="./images/shovel.png"
+						alt="Tiles Dug"
+						className="w-6 h-6 aspect-square"
+					/>{" "}
+					{stats.revealed}
 				</span>
-				<span className="stat">
-					<img src="./images/flag.png" alt="Flags" /> {stats.flags}
+				<span className="flex items-center gap-2 font-bold">
+					<img
+						src="./images/flag.png"
+						alt="Flags"
+						className="w-6 h-6 aspect-square"
+					/>{" "}
+					{stats.flags}
 				</span>
 			</div>
-			<div>
+			<div className="flex-1 flex gap-2 items-center justify-end">
 				<button
 					type="button"
 					className="circle-btn"

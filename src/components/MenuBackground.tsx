@@ -1,8 +1,7 @@
-import "./MenuBackground.css";
 import { makeNoise2D } from "fast-simplex-noise";
 import { useEffect, useRef } from "react";
-import { useSettings } from "../../contexts/SettingsContext";
-import { ImageManager } from "../Game/ImageManager";
+import { ImageManager } from "@/components/Game/ImageManager";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export default function MenuBackground() {
 	const { settings } = useSettings();
@@ -29,7 +28,8 @@ export default function MenuBackground() {
 
 		const render = () => {
 			ctx.resetTransform();
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.fillStyle = "#4AC0FD";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			const scroll = performance.now() / 1000;
 
 			if (settings.classicBackground) {
@@ -54,7 +54,6 @@ export default function MenuBackground() {
 					x < scroll + Math.ceil(canvas.width / ppu);
 					x++
 				) {
-					ctx.fillStyle = "#000";
 					const normalizedNoise = noise.current(x / 15, 0) * 0.5 + 0.5;
 					const yy = normalizedNoise * 5;
 					for (let y = 1; y <= yy + 1; y++) {
@@ -82,5 +81,5 @@ export default function MenuBackground() {
 		};
 	}, [settings.classicBackground]);
 
-	return <canvas ref={canvasRef} />;
+	return <canvas ref={canvasRef} className="absolute inset-0 -z-10" />;
 }

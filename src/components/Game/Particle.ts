@@ -1,4 +1,4 @@
-import type Vector2 from "./Vector2";
+import type { Vector2 } from "@/lib/utils";
 
 export default class Particle {
 	public velocity: Vector2 = { x: (Math.random() * 2 - 1) / 20, y: 0 };

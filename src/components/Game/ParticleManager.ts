@@ -1,6 +1,6 @@
+import type { Vector2 } from "@/lib/utils";
 import { ImageManager } from "./ImageManager";
 import Particle from "./Particle";
-import type Vector2 from "./Vector2";
 
 export default class ParticleManager {
 	private entities: {

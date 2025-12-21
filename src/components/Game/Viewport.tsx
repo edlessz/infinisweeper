@@ -1,11 +1,10 @@
-import "./Viewport.css";
 import { useEffect, useRef, useState } from "react";
-import { useSettings } from "../../../contexts/SettingsContext";
-import type Game from "../Game";
-import type { GameStats } from "../Game";
-import Menubar from "../Menubar/Menubar";
-import SweepedDialog from "../SweepedDialog/SweepedDialog";
-import subtexts from "../subtexts.json";
+import { useSettings } from "@/contexts/SettingsContext";
+import type Game from "./Game";
+import type { GameStats } from "./Game";
+import Menubar from "./Menubar";
+import SweepedDialog from "./SweepedDialog";
+import subtexts from "./subtexts.json";
 
 interface ViewportProps {
 	game: Game;
@@ -108,8 +107,8 @@ export default function Viewport({ game, newGame }: ViewportProps) {
 	}, [game, settings]);
 
 	return (
-		<div className="Viewport">
-			<canvas ref={canvasRef} />
+		<div className="w-full h-full relative overflow-hidden">
+			<canvas ref={canvasRef} className="absolute inset-0 touch-none" />
 			<Menubar gameActive={gameActive} game={game} stats={stats} />
 			<SweepedDialog
 				dialogVisible={dialogVisible}

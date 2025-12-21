@@ -1,12 +1,11 @@
-import "./SweepedDialog.css";
+import { useNavigate } from "@tanstack/react-router";
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useDb } from "../../../contexts/DbContext";
-import { useView, Views } from "../../../contexts/ViewContext";
-import { db } from "../../../lib/firebase";
-import Dialog from "../../Dialog/Dialog";
-import type { GameStats } from "../Game";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useDb } from "@/contexts/DbContext";
+import { db } from "@/lib/firebase";
+import type { GameStats } from "./Game";
 
 interface SweepedDialogProps {
 	dialogVisible: boolean;
@@ -20,7 +19,7 @@ export default function SweepedDialog({
 	stats,
 	newGame,
 }: SweepedDialogProps) {
-	const { setView } = useView();
+	const navigate = useNavigate();
 	const { user, name } = useDb();
 	const [scoreSubmitted, setScoreSubmitted] = useState(false);
 	const [highScore, setHighScore] = useState<number | null>(null);
@@ -111,63 +110,65 @@ export default function SweepedDialog({
 	const canSubmitScore = user && !scoreSubmitted && isNewHighScore;
 
 	return (
-		<Dialog visible={dialogVisible} className="SweepedDialog">
-			<div>
-				<h1>You've been sweeped!</h1>
-				<span className="subtext">{subtext}</span>
-			</div>
-			<div>
-				<span className="score">{stats.revealed} Points</span>
-
-				<div className="share-buttons">
-					<a
-						href={getFacebookShareLink()}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<img
-							height="32"
-							width="32"
-							src="https://cdn.simpleicons.org/facebook"
-							alt="Share on Facebook"
-						/>
-					</a>
-					<a href={getXShareLink()} target="_blank" rel="noopener noreferrer">
-						<img
-							height="32"
-							width="32"
-							src="https://cdn.simpleicons.org/x"
-							alt="Share on X"
-						/>
-					</a>
-					<CopyIcon width={32} height={32} onClick={copyShare} />
+		<Dialog open={dialogVisible}>
+			<DialogContent className="SweepedDialog" showCloseButton={false}>
+				<div>
+					<h1>You've been sweeped!</h1>
+					<span className="subtext">{subtext}</span>
 				</div>
-			</div>
-			<div className="button-container">
-				<button
-					type="button"
-					disabled={!canSubmitScore || loadingHighScore}
-					onClick={submitScore}
-				>
-					{!user
-						? "Login to Submit Score!"
-						: loadingHighScore
-							? "Loading..."
-							: scoreSubmitted
-								? "Score Submitted!"
-								: !isNewHighScore
-									? `High Score: ${highScore ?? 0}`
-									: "Submit Score"}
-				</button>
-				{newGame && (
-					<button type="button" onClick={newGame}>
-						New Game
+				<div>
+					<span className="score">{stats.revealed} Points</span>
+
+					<div className="share-buttons">
+						<a
+							href={getFacebookShareLink()}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<img
+								height="32"
+								width="32"
+								src="https://cdn.simpleicons.org/facebook"
+								alt="Share on Facebook"
+							/>
+						</a>
+						<a href={getXShareLink()} target="_blank" rel="noopener noreferrer">
+							<img
+								height="32"
+								width="32"
+								src="https://cdn.simpleicons.org/x"
+								alt="Share on X"
+							/>
+						</a>
+						<CopyIcon width={32} height={32} onClick={copyShare} />
+					</div>
+				</div>
+				<div className="button-container">
+					<button
+						type="button"
+						disabled={!canSubmitScore || loadingHighScore}
+						onClick={submitScore}
+					>
+						{!user
+							? "Login to Submit Score!"
+							: loadingHighScore
+								? "Loading..."
+								: scoreSubmitted
+									? "Score Submitted!"
+									: !isNewHighScore
+										? `High Score: ${highScore ?? 0}`
+										: "Submit Score"}
 					</button>
-				)}
-				<button type="button" onClick={() => setView(Views.MENU)}>
-					Main Menu
-				</button>
-			</div>
+					{newGame && (
+						<button type="button" onClick={newGame}>
+							New Game
+						</button>
+					)}
+					<button type="button" onClick={() => navigate({ to: "/" })}>
+						Main Menu
+					</button>
+				</div>
+			</DialogContent>
 		</Dialog>
 	);
 }

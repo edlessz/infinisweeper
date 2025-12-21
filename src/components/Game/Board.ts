@@ -1,11 +1,11 @@
 import seedrandom from "seedrandom";
+import type { Vector2 } from "@/lib/utils";
 import { AudioManager } from "./AudioManager";
 import type Game from "./Game";
 import type { GameStats, SaveData } from "./Game";
 import { ImageManager } from "./ImageManager";
 import Particle from "./Particle";
 import ParticleManager from "./ParticleManager";
-import type Vector2 from "./Vector2";
 
 type Key = [number, number];
 interface Tile {

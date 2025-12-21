@@ -1,7 +1,7 @@
+import type { Vector2 } from "@/lib/utils";
 import type { Settings } from "../../contexts/SettingsProvider";
 import Board from "./Board";
 import Camera from "./Camera";
-import type Vector2 from "./Vector2";
 
 export interface SaveData {
 	seed: number;
