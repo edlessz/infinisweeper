@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -33,7 +34,7 @@ const Changelog = () => {
 				<CardTitle>Changelog</CardTitle>
 			</CardHeader>
 			<CardContent className=" overflow-auto">
-				<div className="menu-table changes">
+				<div>
 					{changelog ? (
 						changelog.map((entry) => (
 							<details key={entry.version}>
@@ -54,9 +55,9 @@ const Changelog = () => {
 				</div>
 			</CardContent>
 			<CardFooter>
-				<button type="button" onClick={() => navigate({ to: "/" })}>
+				<Button type="button" onClick={() => navigate({ to: "/" })}>
 					Back
-				</button>
+				</Button>
 			</CardFooter>
 		</Card>
 	);

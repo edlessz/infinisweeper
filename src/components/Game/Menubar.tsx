@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import Game, { type GameStats } from "./Game";
 
 interface MenubarProps {
@@ -46,21 +47,21 @@ export default function Menubar({ gameActive, game, stats }: MenubarProps) {
 	return (
 		<div className="absolute bottom-0 left-0 w-full p-4 bg-[rgba(255, 255, 255, 0.75)] flex items-center gap-2">
 			<div className="flex-1 flex gap-2 items-center justify-start">
-				<button
+				<Button
 					type="button"
-					className="circle-btn"
+					size="icon"
 					onClick={() => navigate({ to: "/" })}
 				>
 					<Home />
-				</button>
-				<button
+				</Button>
+				<Button
 					type="button"
-					className="circle-btn"
+					size="icon"
 					onClick={() => gameActive && saveGame()}
 					disabled={!gameActive}
 				>
 					<SaveIcon />
-				</button>
+				</Button>
 				<span ref={saveTextRef}>{saveText}</span>
 			</div>
 			<div className="flex-1 flex gap-2 items-center justify-center">
@@ -82,20 +83,20 @@ export default function Menubar({ gameActive, game, stats }: MenubarProps) {
 				</span>
 			</div>
 			<div className="flex-1 flex gap-2 items-center justify-end">
-				<button
+				<Button
 					type="button"
-					className="circle-btn"
+					size="icon"
 					onClick={() => game.zoom(1)}
 				>
 					<ZoomInIcon />
-				</button>
-				<button
+				</Button>
+				<Button
 					type="button"
-					className="circle-btn"
+					size="icon"
 					onClick={() => game.zoom(-1)}
 				>
 					<ZoomOutIcon />
-				</button>
+				</Button>
 			</div>
 		</div>
 	);

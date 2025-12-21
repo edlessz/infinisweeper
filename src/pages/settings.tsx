@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { ButtonList } from "@/components/ButtonList";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -40,7 +42,7 @@ const Settings = () => {
 				<CardTitle>Settings</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<div className="menu-table grid grid-cols-2 gap-4 items-center">
+				<div className="grid grid-cols-2 gap-4 items-center">
 					<div>
 						<span>Display Name:</span>
 						<div>Your username on the scoreboards.</div>
@@ -98,13 +100,15 @@ const Settings = () => {
 					/>
 				</div>
 			</CardContent>
-			<CardFooter>
-				<button type="button" onClick={save}>
-					Save & Return
-				</button>
-				<button type="button" onClick={discard}>
-					Discard & Return
-				</button>
+			<CardFooter className="justify-center">
+				<ButtonList horizontal>
+					<Button type="button" onClick={save}>
+						Save
+					</Button>
+					<Button type="button" onClick={discard}>
+						Cancel
+					</Button>
+				</ButtonList>
 			</CardFooter>
 		</Card>
 	);

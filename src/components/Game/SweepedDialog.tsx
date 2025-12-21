@@ -2,9 +2,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useDb } from "@/contexts/DbContext";
 import { db } from "@/lib/firebase";
+import { ButtonList } from "../ButtonList";
 import type { GameStats } from "./Game";
 
 interface SweepedDialogProps {
@@ -143,8 +145,8 @@ export default function SweepedDialog({
 						<CopyIcon width={32} height={32} onClick={copyShare} />
 					</div>
 				</div>
-				<div className="button-container">
-					<button
+				<ButtonList>
+					<Button
 						type="button"
 						disabled={!canSubmitScore || loadingHighScore}
 						onClick={submitScore}
@@ -158,16 +160,16 @@ export default function SweepedDialog({
 									: !isNewHighScore
 										? `High Score: ${highScore ?? 0}`
 										: "Submit Score"}
-					</button>
+					</Button>
 					{newGame && (
-						<button type="button" onClick={newGame}>
+						<Button type="button" onClick={newGame}>
 							New Game
-						</button>
+						</Button>
 					)}
-					<button type="button" onClick={() => navigate({ to: "/" })}>
+					<Button type="button" onClick={() => navigate({ to: "/" })}>
 						Main Menu
-					</button>
-				</div>
+					</Button>
+				</ButtonList>
 			</DialogContent>
 		</Dialog>
 	);

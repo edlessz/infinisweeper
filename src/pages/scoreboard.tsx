@@ -8,6 +8,8 @@ import {
 	where,
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
+import { ButtonList } from "@/components/ButtonList";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -36,7 +38,7 @@ const Scoreboard = () => {
 		try {
 			const modes = [
 				{ id: "classic", label: "Classic" },
-				// { id: "timeAttack", label: "Time Attack" }, // Future mode
+				{ id: "timeAttack", label: "Time Attack" }, // Future mode
 			];
 
 			const scoresByMode: Record<string, ScoreEntry[]> = {};
@@ -76,7 +78,7 @@ const Scoreboard = () => {
 				<CardTitle>Scoreboard</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<div className="menu-table">
+				<div className="flex gap-4">
 					{scoreboard === null && <span>Loading...</span>}
 					{Object.entries(scoreboard || {}).map(([gameType, scores]) => (
 						<div key={gameType} className="scoreboard-table">
@@ -101,10 +103,12 @@ const Scoreboard = () => {
 					))}
 				</div>
 			</CardContent>
-			<CardFooter>
-				<button type="button" onClick={() => navigate({ to: "/" })}>
-					Back
-				</button>
+			<CardFooter className="justify-center">
+				<ButtonList horizontal>
+					<Button type="button" onClick={() => navigate({ to: "/" })}>
+						Back
+					</Button>
+				</ButtonList>
 			</CardFooter>
 		</Card>
 	);
