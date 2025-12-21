@@ -17,4 +17,4 @@
 - **Canvas API** for performant grid rendering.
 - **TypeScript** for type-safe development.
 - **React** for interface logic.
-- **Supabase** for authentication and leaderboard functionality.
+- **Firebase** for authentication and leaderboard functionality.

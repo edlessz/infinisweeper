@@ -1,22 +1,22 @@
 .Changelog .changes {
-  display: flex;
-  flex-direction: column;
-  min-width: 24rem;
+	display: flex;
+	flex-direction: column;
+	min-width: 24rem;
 
-  max-height: 80vh;
-  overflow-y: auto;
+	max-height: 80vh;
+	overflow-y: auto;
 
-  summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    &:hover {
-      font-weight: bold;
-    }
-  }
+	summary {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		cursor: pointer;
+		&:hover {
+			font-weight: bold;
+		}
+	}
 
-  ul {
-    margin: 0;
-  }
+	ul {
+		margin: 0;
+	}
 }

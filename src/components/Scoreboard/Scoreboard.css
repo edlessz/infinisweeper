@@ -1,18 +1,18 @@
 .Scoreboard {
-  h1 {
-    margin: 0;
-  }
-  .table {
-    display: flex;
-    flex-direction: row;
-    gap: 2rem;
+	h1 {
+		margin: 0;
+	}
+	.table {
+		display: flex;
+		flex-direction: row;
+		gap: 2rem;
 
-    .header {
-      text-align: center;
-      font-weight: bold;
-    }
-    tr > td:last-child {
-      text-align: right;
-    }
-  }
+		.header {
+			text-align: center;
+			font-weight: bold;
+		}
+		tr > td:last-child {
+			text-align: right;
+		}
+	}
 }

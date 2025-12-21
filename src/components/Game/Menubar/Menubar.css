@@ -1,57 +1,57 @@
 .Menubar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.75);
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	padding: 1rem;
+	background: rgba(255, 255, 255, 0.75);
 
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 
-  > div {
-    flex: 1;
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
+	> div {
+		flex: 1;
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
 
-  .stat {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-weight: bold;
-  }
+	.stat {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-weight: bold;
+	}
 
-  img {
-    width: 1.5rem;
-    height: 1.5rem;
-    aspect-ratio: 1;
-  }
+	img {
+		width: 1.5rem;
+		height: 1.5rem;
+		aspect-ratio: 1;
+	}
 
-  & > :first-child {
-    justify-content: flex-start;
-  }
-  & > :last-child {
-    justify-content: flex-end;
-  }
-  & > :not(:first-child):not(:last-child) {
-    justify-content: center;
-  }
+	& > :first-child {
+		justify-content: flex-start;
+	}
+	& > :last-child {
+		justify-content: flex-end;
+	}
+	& > :not(:first-child):not(:last-child) {
+		justify-content: center;
+	}
 }
 
 .fade-out {
-  animation: fadeOut 2s ease-in-out forwards;
+	animation: fadeOut 2s ease-in-out forwards;
 }
 @keyframes fadeOut {
-  0% {
-    opacity: 1;
-  }
-  75% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+	0% {
+		opacity: 1;
+	}
+	75% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }

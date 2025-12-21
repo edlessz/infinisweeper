@@ -1,17 +1,17 @@
 .ed-form {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: 1rem;
-  align-items: center;
+	display: grid;
+	grid-template-columns: repeat(2, auto);
+	gap: 1rem;
+	align-items: center;
 
-  span {
-    font-weight: bold;
-  }
+	span {
+		font-weight: bold;
+	}
 }
 
 input[type="text"],
 textarea {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 1rem;
+	padding: 0.25rem 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 1rem;
 }
