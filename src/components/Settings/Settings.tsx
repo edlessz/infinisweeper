@@ -26,16 +26,7 @@ export default function Settings() {
       await saveSettings(localSettings);
       setView(Views.MENU);
     } catch (error: unknown) {
-      switch (error.code) {
-        case "23505":
-          alert("Display name already exists. Please choose another.");
-          break;
-        case "23514":
-          alert("Display name cannot be empty.");
-          break;
-        default:
-          alert("An unexpected error occurred. Please try again.");
-      }
+      alert("An unexpected error occurred. Please try again.");
     }
   };
   const discard = () => setView(Views.MENU);
