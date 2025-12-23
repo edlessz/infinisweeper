@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .env
+.vite
 
 # TanStack Router
 src/routeTree.gen.ts

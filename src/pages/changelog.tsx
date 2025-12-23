@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
+import { ButtonList } from "@/components/ButtonList";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -54,10 +55,12 @@ const Changelog = () => {
 					)}
 				</div>
 			</CardContent>
-			<CardFooter>
-				<Button type="button" onClick={() => navigate({ to: "/" })}>
-					Back
-				</Button>
+			<CardFooter className="justify-center">
+				<ButtonList>
+					<Button type="button" onClick={() => navigate({ to: "/" })}>
+						Back
+					</Button>
+				</ButtonList>
 			</CardFooter>
 		</Card>
 	);

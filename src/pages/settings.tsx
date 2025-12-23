@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { ButtonList } from "@/components/ButtonList";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,96 +10,125 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useDb } from "@/contexts/DbContext";
 import { useSettings } from "@/contexts/SettingsContext";
+import { typedEntries } from "@/lib/utils";
 
 const Settings = () => {
 	const navigate = useNavigate();
-	const { updateName, user, name } = useDb();
-	const { settings, saveSettings, settingsDescriptions } = useSettings();
+	const { user, name } = useDb();
+	const { settings, saveSettings, SettingsMetadata } = useSettings();
+	const [tempSettings, setTempSettings] = useState({
+		...settings,
+		displayName: name || settings.displayName || "",
+	});
 
-	const [nameField, setNameField] = useState<string>(name ?? "");
-	const [localSettings, setLocalSettings] = useState(settings);
-	const setLocalSetting = (key: keyof typeof localSettings, value: boolean) => {
-		setLocalSettings((prev) => {
-			const newSettings = { ...prev, [key]: value };
-			return newSettings;
-		});
-	};
-
-	const save = async () => {
+	const save = () => {
 		try {
-			await updateName(nameField);
-			await saveSettings(localSettings);
+			saveSettings(tempSettings);
+			// Only navigate if save was successful
 			navigate({ to: "/" });
-		} catch {
-			alert("An unexpected error occurred. Please try again.");
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : "Failed to save settings.");
 		}
 	};
 	const discard = () => navigate({ to: "/" });
+
 	return (
 		<Card>
 			<CardHeader>
 				<CardTitle>Settings</CardTitle>
 			</CardHeader>
-			<CardContent>
-				<div className="grid grid-cols-2 gap-4 items-center">
-					<div>
-						<span>Display Name:</span>
-						<div>Your username on the scoreboards.</div>
-					</div>
-					<input
-						type="text"
-						defaultValue={user ? nameField : ""}
-						onChange={(e) => setNameField(e.target.value)}
-						disabled={!user}
-						placeholder={user ? "Enter Display Name" : "Please Sign In!"}
-					/>
-					<div>
-						<span>Classic Background:</span>
-						<div>{settingsDescriptions.classicBackground}</div>
-					</div>
-					<input
-						type="checkbox"
-						checked={localSettings.classicBackground}
-						onChange={(e) =>
-							setLocalSetting("classicBackground", e.target.checked)
-						}
-					/>
-					<div>
-						<span>Disable Borders:</span>
-						<div>{settingsDescriptions.disableBorders}</div>
-					</div>
-					<input
-						type="checkbox"
-						checked={localSettings.disableBorders}
-						onChange={(e) =>
-							setLocalSetting("disableBorders", e.target.checked)
-						}
-					/>
-					<div>
-						<span>Disable Camera Shake:</span>
-						<div>{settingsDescriptions.disableCameraShake}</div>
-					</div>
-					<input
-						type="checkbox"
-						checked={localSettings.disableCameraShake}
-						onChange={(e) =>
-							setLocalSetting("disableCameraShake", e.target.checked)
-						}
-					/>
-					<div>
-						<span>Disable Particles:</span>
-						<div>{settingsDescriptions.disableParticles}</div>
-					</div>
-					<input
-						type="checkbox"
-						checked={localSettings.disableParticles}
-						onChange={(e) =>
-							setLocalSetting("disableParticles", e.target.checked)
-						}
-					/>
-				</div>
+			<CardContent className="flex flex-col gap-2">
+				{typedEntries(SettingsMetadata).map(([key, meta]) => {
+					if (key === "displayName") {
+						return (
+							<Label
+								key={key}
+								className="flex flex-col items-start gap-3 rounded-lg border p-3"
+							>
+								<div className="grid gap-1.5">
+									<p className="text-sm leading-none font-medium">
+										{meta.name}
+									</p>
+									<p className="text-muted-foreground text-sm">
+										{meta.description}
+									</p>
+								</div>
+								<Input
+									type="text"
+									autoComplete="username"
+									value={tempSettings[key] as string}
+									onChange={(e) =>
+										setTempSettings({
+											...tempSettings,
+											[key]: e.target.value,
+										})
+									}
+									disabled={!user}
+									placeholder={!user ? "Please sign-in!" : ""}
+								/>
+							</Label>
+						);
+					}
+
+					switch (meta.type) {
+						case "boolean":
+							return (
+								<Label
+									key={key}
+									className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-aria-checked:border-gray-600 has-aria-checked:bg-gray-50 dark:has-aria-checked:border-gray-900 dark:has-aria-checked:bg-gray-950"
+								>
+									<Checkbox
+										checked={tempSettings[key] === true}
+										onCheckedChange={(c) =>
+											setTempSettings({
+												...tempSettings,
+												[key]: c === true,
+											})
+										}
+									></Checkbox>
+									<div className="grid gap-1.5 font-normal">
+										<p className="text-sm leading-none font-medium">
+											{meta.name}
+										</p>
+										<p className="text-muted-foreground text-sm">
+											{meta.description}
+										</p>
+									</div>
+								</Label>
+							);
+						default:
+							return (
+								<Label
+									key={key}
+									className="flex flex-col items-start gap-3 rounded-lg border p-3"
+								>
+									<div className="grid gap-1.5">
+										<p className="text-sm leading-none font-medium">
+											{meta.name}
+										</p>
+										<p className="text-muted-foreground text-sm">
+											{meta.description}
+										</p>
+									</div>
+									<Input
+										type="text"
+										value={tempSettings[key] as boolean | string as string}
+										onChange={(e) =>
+											setTempSettings({
+												...tempSettings,
+												[key]: e.target.value,
+											})
+										}
+									/>
+								</Label>
+							);
+					}
+				})}
 			</CardContent>
 			<CardFooter className="justify-center">
 				<ButtonList horizontal>

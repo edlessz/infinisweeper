@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { LogIn, LogOut } from "lucide-react";
+import { toast } from "sonner";
 import { ButtonList } from "@/components/ButtonList";
 import Game from "@/components/Game/Game";
 import { Button } from "@/components/ui/button";
@@ -49,14 +50,34 @@ const Index = () => {
 				{user ? (
 					<>
 						<span>{name ? name : "Loading..."}</span>
-						<Button type="button" size="icon" onClick={logout}>
+						<Button
+							type="button"
+							size="icon"
+							onClick={async () => {
+								try {
+									await logout();
+								} catch {
+									toast.error("Failed to log out!");
+								}
+							}}
+						>
 							<LogOut />
 						</Button>
 					</>
 				) : (
 					<>
 						<span className="text-red-900">Signed Out</span>
-						<Button type="button" size="icon" onClick={login}>
+						<Button
+							type="button"
+							size="icon"
+							onClick={async () => {
+								try {
+									await login();
+								} catch {
+									toast.error("Failed to log in!");
+								}
+							}}
+						>
 							<LogIn />
 						</Button>
 					</>

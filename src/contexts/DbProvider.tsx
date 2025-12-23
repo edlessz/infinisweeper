@@ -71,45 +71,33 @@ export const DbProvider = ({ children }: DbProviderProps) => {
 		name,
 		login: async () => {
 			const provider = new GoogleAuthProvider();
-			try {
-				await signInWithPopup(auth, provider);
-			} catch (error) {
-				console.error("Error signing in:", error);
-			}
+			await signInWithPopup(auth, provider);
 		},
 		logout: async () => {
-			try {
-				await firebaseSignOut(auth);
-			} catch (error) {
-				console.error("Error signing out:", error);
-			}
+			await firebaseSignOut(auth);
 		},
 		updateName: async (newName: string) => {
 			if (!user) return;
 
-			try {
-				const userDocRef = doc(db, "users", user.uid);
-				await setDoc(userDocRef, { username: newName }, { merge: true });
+			const userDocRef = doc(db, "users", user.uid);
+			await setDoc(userDocRef, { username: newName }, { merge: true });
 
-				// Update username in all score documents (format: UID_modename)
-				const scoresRef = collection(db, "scores");
-				const q = query(
-					scoresRef,
-					where(documentId(), ">=", `${user.uid}_`),
-					where(documentId(), "<=", `${user.uid}_\uf8ff`),
-				);
+			// Update username in all score documents (format: UID_modename)
+			const scoresRef = collection(db, "scores");
+			const q = query(
+				scoresRef,
+				where(documentId(), ">=", `${user.uid}_`),
+				where(documentId(), "<=", `${user.uid}_\uf8ff`),
+			);
 
-				const querySnapshot = await getDocs(q);
-				await Promise.all(
-					querySnapshot.docs.map((docSnap) =>
-						setDoc(docSnap.ref, { username: newName }, { merge: true }),
-					),
-				);
+			const querySnapshot = await getDocs(q);
+			await Promise.all(
+				querySnapshot.docs.map((docSnap) =>
+					setDoc(docSnap.ref, { username: newName }, { merge: true }),
+				),
+			);
 
-				setName(newName);
-			} catch (error) {
-				console.error("Error updating username:", error);
-			}
+			setName(newName);
 		},
 	};
 

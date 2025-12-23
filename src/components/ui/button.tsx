@@ -1,4 +1,4 @@
-import { type VariantProps, cva } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -12,8 +12,7 @@ const buttonVariants = cva(
 					"bg-[#e4c29e] border-2 border-[#b99e81] hover:bg-[#d4b18a] active:bg-[#b99e81] transition-[background-color] duration-100",
 				outline:
 					"border-2 border-[#b99e81] bg-transparent hover:bg-[#e4c29e] active:bg-[#d4b18a]",
-				ghost:
-					"hover:bg-[#e4c29e]/50 active:bg-[#e4c29e]",
+				ghost: "hover:bg-[#e4c29e]/50 active:bg-[#e4c29e]",
 				link: "text-foreground underline-offset-4 hover:underline",
 			},
 			size: {
@@ -36,12 +35,7 @@ export interface ButtonProps
 	asChild?: boolean;
 }
 
-function Button({
-	className,
-	variant,
-	size,
-	...props
-}: ButtonProps) {
+function Button({ className, variant, size, ...props }: ButtonProps) {
 	return (
 		<button
 			className={cn(buttonVariants({ variant, size, className }))}

@@ -38,7 +38,7 @@ const Scoreboard = () => {
 		try {
 			const modes = [
 				{ id: "classic", label: "Classic" },
-				{ id: "timeAttack", label: "Time Attack" }, // Future mode
+				// { id: "timeAttack", label: "Time Attack" }, // Future mode
 			];
 
 			const scoresByMode: Record<string, ScoreEntry[]> = {};

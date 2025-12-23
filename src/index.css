@@ -18,13 +18,6 @@ body {
 	height: 100svh;
 }
 
-input[type="text"],
-textarea {
-	padding: 0.25rem 0.5rem;
-	border: 1px solid #ccc;
-	border-radius: 1rem;
-}
-
 @theme inline {
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
