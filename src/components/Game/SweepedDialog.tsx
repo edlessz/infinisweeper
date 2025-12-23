@@ -2,8 +2,15 @@ import { useNavigate } from "@tanstack/react-router";
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { useDb } from "@/contexts/DbContext";
 import { db } from "@/lib/firebase";
 import { ButtonList } from "../ButtonList";
@@ -26,6 +33,7 @@ export default function SweepedDialog({
 	const [scoreSubmitted, setScoreSubmitted] = useState(false);
 	const [highScore, setHighScore] = useState<number | null>(null);
 	const [loadingHighScore, setLoadingHighScore] = useState(false);
+	const [displayScore, setDisplayScore] = useState(0);
 
 	useEffect(() => {
 		setScoreSubmitted(false);
@@ -54,6 +62,36 @@ export default function SweepedDialog({
 		fetchHighScore();
 	}, [dialogVisible, user]);
 
+	// Animated counter effect with ease-out
+	useEffect(() => {
+		if (!dialogVisible) {
+			setDisplayScore(0);
+			return;
+		}
+
+		const duration = 1500; // 1.5 seconds
+		const startTime = Date.now();
+
+		const animate = () => {
+			const elapsed = Date.now() - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+
+			// Ease-out cubic: starts fast, slows down at the end
+			const easeOut = 1 - (1 - progress) ** 3;
+			const currentScore = Math.floor(easeOut * stats.revealed);
+
+			setDisplayScore(currentScore);
+
+			if (progress < 1) {
+				requestAnimationFrame(animate);
+			} else {
+				setDisplayScore(stats.revealed);
+			}
+		};
+
+		requestAnimationFrame(animate);
+	}, [dialogVisible, stats.revealed]);
+
 	const getShareContent = (): string => {
 		const points = stats.revealed
 			.toString()
@@ -78,13 +116,13 @@ export default function SweepedDialog({
 		navigator.clipboard
 			.writeText(shareContent)
 			.then(() => {
-				alert("Copied score to clipboard!");
+				toast.success("Score copied to clipboard!");
 			})
-			.catch((err) => {
-				alert("Failed to copy score.");
-				console.error("Failed to copy share content:", err);
+			.catch(() => {
+				toast.error("Failed to copy score to clipboard.");
 			});
 	};
+
 	const submitScore = async () => {
 		if (!user || !name || scoreSubmitted) return;
 		setScoreSubmitted(true);
@@ -101,9 +139,8 @@ export default function SweepedDialog({
 			});
 
 			setScoreSubmitted(true);
-		} catch (error) {
-			alert("Failed to submit score.");
-			console.error("Error submitting score:", error);
+		} catch {
+			toast.error("Failed to submit score.");
 			setScoreSubmitted(false);
 		}
 	};
@@ -114,62 +151,82 @@ export default function SweepedDialog({
 	return (
 		<Dialog open={dialogVisible}>
 			<DialogContent className="SweepedDialog" showCloseButton={false}>
-				<div>
-					<h1>You've been sweeped!</h1>
-					<span className="subtext">{subtext}</span>
-				</div>
-				<div>
-					<span className="score">{stats.revealed} Points</span>
+				<DialogTitle className="text-center text-xl">
+					You've been sweeped!
+				</DialogTitle>
+				<DialogDescription className="text-center">{subtext}</DialogDescription>
+				<div className="flex flex-col items-center">
+					<div className="flex flex-col items-center gap-1 mb-4">
+						<span className="text-6xl font-bold bg-linear-to-r from-purple-500 to-purple-700 bg-clip-text text-transparent animate-in zoom-in duration-500">
+							{displayScore.toLocaleString()}
+						</span>
+						<span className="text-sm text-muted-foreground">Points</span>
+						{isNewHighScore && highScore !== null && (
+							<span className="text-xs text-green-600 font-semibold animate-in fade-in slide-in-from-bottom-2 duration-300">
+								🎉 New High Score! (+
+								{(stats.revealed - highScore).toLocaleString()})
+							</span>
+						)}
+					</div>
 
-					<div className="share-buttons">
-						<a
-							href={getFacebookShareLink()}
-							target="_blank"
-							rel="noopener noreferrer"
+					<div className="flex gap-2">
+						<Button size="icon">
+							<a
+								href={getFacebookShareLink()}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label="Share on Facebook"
+							>
+								<img height="16" width="16" src="icons/facebook.svg" alt="" />
+							</a>
+						</Button>
+						<Button size="icon">
+							<a
+								href={getXShareLink()}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label="Share on X"
+							>
+								<img height="16" width="16" src="icons/x.svg" alt="" />
+							</a>
+						</Button>
+						<Button
+							type="button"
+							size="icon"
+							onClick={copyShare}
+							aria-label="Copy score to clipboard"
 						>
-							<img
-								height="32"
-								width="32"
-								src="https://cdn.simpleicons.org/facebook"
-								alt="Share on Facebook"
-							/>
-						</a>
-						<a href={getXShareLink()} target="_blank" rel="noopener noreferrer">
-							<img
-								height="32"
-								width="32"
-								src="https://cdn.simpleicons.org/x"
-								alt="Share on X"
-							/>
-						</a>
-						<CopyIcon width={32} height={32} onClick={copyShare} />
+							<CopyIcon height="16" width="16" />
+						</Button>
 					</div>
 				</div>
-				<ButtonList>
-					<Button
-						type="button"
-						disabled={!canSubmitScore || loadingHighScore}
-						onClick={submitScore}
-					>
-						{!user
-							? "Login to Submit Score!"
-							: loadingHighScore
-								? "Loading..."
-								: scoreSubmitted
-									? "Score Submitted!"
-									: !isNewHighScore
-										? `High Score: ${highScore ?? 0}`
-										: "Submit Score"}
-					</Button>
-					{newGame && (
-						<Button type="button" onClick={newGame}>
-							New Game
+				<DialogFooter>
+					<ButtonList>
+						<Button
+							type="button"
+							disabled={!canSubmitScore || loadingHighScore}
+							onClick={submitScore}
+						>
+							{!user
+								? "Login to Submit Score!"
+								: loadingHighScore
+									? "Loading..."
+									: scoreSubmitted
+										? "Score Submitted!"
+										: !isNewHighScore
+											? `High Score: ${highScore ?? 0}`
+											: "Submit Score"}
 						</Button>
-					)}
-					<Button type="button" onClick={() => navigate({ to: "/" })}>
-						Main Menu
-					</Button>
-				</ButtonList>
+						{newGame && (
+							<Button type="button" onClick={newGame}>
+								New Game
+							</Button>
+						)}
+						<Button type="button" onClick={() => navigate({ to: "/" })}>
+							Main Menu
+						</Button>
+					</ButtonList>
+				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);

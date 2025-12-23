@@ -45,7 +45,7 @@ export default function Menubar({ gameActive, game, stats }: MenubarProps) {
 	};
 
 	return (
-		<div className="absolute bottom-0 left-0 w-full p-4 bg-[rgba(255, 255, 255, 0.75)] flex items-center gap-2">
+		<div className="absolute bottom-0 left-0 w-full p-4 bg-white flex items-center gap-2">
 			<div className="flex-1 flex gap-2 items-center justify-start">
 				<Button type="button" size="icon" onClick={() => navigate({ to: "/" })}>
 					<Home />

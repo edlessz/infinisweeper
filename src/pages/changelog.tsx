@@ -38,10 +38,18 @@ const Changelog = () => {
 				<div>
 					{changelog ? (
 						changelog.map((entry) => (
-							<details key={entry.version}>
-								<summary className="flex justify-between items-center cursor-pointer selection:font-bold">
-									<span>{entry.version}</span>
-									<span>{entry.date}</span>
+							<details key={entry.version} className="mb-2 group">
+								<summary className="cursor-pointer selection:font-bold flex items-center [&::marker]:content-none before:content-['▶'] before:mr-2 before:text-xs before:transition-transform before:inline-block group-open:before:rotate-90">
+									<span className="flex-1 flex justify-between items-center">
+										<span>{entry.version}</span>
+										<span>
+											{new Date(entry.date).toLocaleDateString("en-us", {
+												year: "numeric",
+												month: "short",
+												day: "numeric",
+											})}
+										</span>
+									</span>
 								</summary>
 								<ul className="ml-8 list-disc">
 									{entry.changes.map((change) => (

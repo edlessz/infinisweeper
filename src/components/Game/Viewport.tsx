@@ -4,7 +4,6 @@ import type Game from "./Game";
 import type { GameStats } from "./Game";
 import Menubar from "./Menubar";
 import SweepedDialog from "./SweepedDialog";
-import subtexts from "./subtexts.json";
 
 interface ViewportProps {
 	game: Game;
@@ -14,6 +13,7 @@ interface ViewportProps {
 export default function Viewport({ game, newGame }: ViewportProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [subtext, setSubtext] = useState("");
+	const [subtexts, setSubtexts] = useState<string[]>([]);
 	const { settings } = useSettings();
 
 	const [stats, setStats] = useState<GameStats>({
@@ -35,6 +35,14 @@ export default function Viewport({ game, newGame }: ViewportProps) {
 		dialogVisibleRef.current = dialogVisible;
 	}, [dialogVisible]);
 
+	// Fetch subtexts from public folder
+	useEffect(() => {
+		fetch("subtexts.json")
+			.then((response) => response.json())
+			.then((data: string[]) => setSubtexts(data))
+			.catch((error) => console.error("Failed to load subtexts:", error));
+	}, []);
+
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		const viewport = canvas?.parentElement ?? null;
@@ -50,10 +58,9 @@ export default function Viewport({ game, newGame }: ViewportProps) {
 			getDialogVisible: () => dialogVisibleRef.current,
 			setDialogVisible,
 			randomizeSubtext: () => {
-				const subtextsTyped: string[] = subtexts as string[];
-				setSubtext(
-					subtextsTyped[Math.floor(Math.random() * subtextsTyped.length)],
-				);
+				if (subtexts.length > 0) {
+					setSubtext(subtexts[Math.floor(Math.random() * subtexts.length)]);
+				}
 			},
 		});
 
@@ -104,7 +111,7 @@ export default function Viewport({ game, newGame }: ViewportProps) {
 			game.canvas = null;
 			cancelAnimationFrame(renderId);
 		};
-	}, [game, settings]);
+	}, [game, settings, subtexts]);
 
 	return (
 		<div className="w-full h-full relative overflow-hidden">

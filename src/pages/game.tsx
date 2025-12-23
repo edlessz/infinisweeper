@@ -1,14 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 import Viewport from "@/components/Game/Viewport";
 import { useGame } from "@/contexts/GameContext";
 
 const Game = () => {
 	const { game, newGame } = useGame();
 
+	useEffect(() => {
+		if (!game) {
+			newGame();
+		}
+	}, [game, newGame]);
+
 	if (!game) {
 		return (
 			<div className="flex items-center justify-center h-full">
-				<span>Could not find game.</span>
+				<span>Loading...</span>
 			</div>
 		);
 	}
