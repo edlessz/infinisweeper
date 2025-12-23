@@ -18,7 +18,7 @@ export const AudioManager = {
 		}
 	},
 
-	play(name: string): void {
+	play(name: string, playbackRate = 1.0): void {
 		const buffer = bufferCache[name];
 		if (!buffer) {
 			console.warn(`Audio "${name}" not loaded.`);
@@ -30,6 +30,7 @@ export const AudioManager = {
 
 		const source = audioCtx.createBufferSource();
 		source.buffer = buffer;
+		source.playbackRate.value = playbackRate;
 		source.connect(masterGain);
 		source.start();
 

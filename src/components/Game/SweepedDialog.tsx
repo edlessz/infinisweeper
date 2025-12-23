@@ -14,6 +14,7 @@ import {
 import { useDb } from "@/contexts/DbContext";
 import { db } from "@/lib/firebase";
 import { ButtonList } from "../ButtonList";
+import { AudioManager } from "./AudioManager";
 import type { GameStats } from "./Game";
 
 interface SweepedDialogProps {
@@ -62,7 +63,7 @@ export default function SweepedDialog({
 		fetchHighScore();
 	}, [dialogVisible, user]);
 
-	// Animated counter effect with ease-out
+	// Animated counter effect with ease-out and sound
 	useEffect(() => {
 		if (!dialogVisible) {
 			setDisplayScore(0);
@@ -71,6 +72,9 @@ export default function SweepedDialog({
 
 		const duration = 1500; // 1.5 seconds
 		const startTime = Date.now();
+		const totalBlips = Math.min(30, Math.max(5, Math.floor(stats.revealed / 10))); // 5-30 blips based on score
+		const blipProgressInterval = 1 / totalBlips;
+		let nextBlipProgress = 0;
 
 		const animate = () => {
 			const elapsed = Date.now() - startTime;
@@ -81,6 +85,14 @@ export default function SweepedDialog({
 			const currentScore = Math.floor(easeOut * stats.revealed);
 
 			setDisplayScore(currentScore);
+
+			// Play blip sound at evenly spaced progress intervals
+			if (progress >= nextBlipProgress && progress < 1) {
+				// Pitch ranges from 1.0 (original) to 2.0 (one octave up)
+				const pitch = 1.0 + nextBlipProgress * 1.0;
+				AudioManager.play("blip_1", pitch);
+				nextBlipProgress += blipProgressInterval;
+			}
 
 			if (progress < 1) {
 				requestAnimationFrame(animate);
