@@ -2,17 +2,13 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { LogIn, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { ButtonList } from "@/components/ButtonList";
-import Game from "@/components/Game/Game";
 import { Button } from "@/components/ui/button";
 import { useDb } from "@/contexts/DbContext";
 import { useGame } from "@/contexts/GameContext";
 
 const Index = () => {
-	const existingGame: boolean =
-		localStorage.getItem(Game.savedGameKey) !== null;
-
 	const { user, name, login, logout } = useDb();
-	const { newGame, continueGame } = useGame();
+	const { existingGame, newGame, continueGame } = useGame();
 	const navigate = useNavigate();
 
 	return (

@@ -47,11 +47,15 @@ AudioManager.loadAudios(
 
 export const GameProvider = ({ children }: GameProviderProps) => {
 	const [game, setGame] = useState<Game | null>(null);
+	const [existingGame, setExistingGame] = useState<boolean>(
+		() => localStorage.getItem(Game.savedGameKey) !== null,
+	);
 	const navigate = useNavigate();
 
 	const newGame = useCallback(() => {
 		const newGameInstance = new Game();
 		setGame(newGameInstance);
+		setExistingGame(true);
 		navigate({ to: "/game" });
 	}, [navigate]);
 
@@ -60,7 +64,10 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 			JSON.parse(localStorage.getItem(Game.savedGameKey) ?? "null") ??
 			undefined;
 
-		if (!savedGame) return;
+		if (!savedGame) {
+			setExistingGame(false);
+			return;
+		}
 
 		const continuedGame = new Game(savedGame);
 		setGame(continuedGame);
@@ -68,7 +75,7 @@ export const GameProvider = ({ children }: GameProviderProps) => {
 	}, [navigate]);
 
 	return (
-		<GameContext.Provider value={{ game, newGame, continueGame }}>
+		<GameContext.Provider value={{ game, existingGame, newGame, continueGame }}>
 			{children}
 		</GameContext.Provider>
 	);

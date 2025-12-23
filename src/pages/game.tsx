@@ -4,13 +4,14 @@ import Viewport from "@/components/Game/Viewport";
 import { useGame } from "@/contexts/GameContext";
 
 const Game = () => {
-	const { game, newGame } = useGame();
+	const { game, newGame, existingGame, continueGame } = useGame();
 
 	useEffect(() => {
 		if (!game) {
-			newGame();
+			if (existingGame) continueGame();
+			else newGame();
 		}
-	}, [game, newGame]);
+	}, [game, newGame, existingGame, continueGame]);
 
 	if (!game) {
 		return (

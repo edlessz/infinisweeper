@@ -3,6 +3,7 @@ import type Game from "@/components/Game/Game";
 
 export interface GameContextValue {
 	game: Game | null;
+	existingGame: boolean;
 	newGame: () => void;
 	continueGame: () => void;
 }
