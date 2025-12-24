@@ -66,7 +66,7 @@ interface SettingsProviderProps {
 }
 
 export const SettingsProvider = ({ children }: SettingsProviderProps) => {
-	const db = useDb();
+	const { user, updateName } = useDb();
 
 	const [settings, setSettings] = useState<Settings>(() => {
 		const existing = localStorage.getItem(settingsKey);
@@ -89,16 +89,18 @@ export const SettingsProvider = ({ children }: SettingsProviderProps) => {
 	});
 
 	const saveSettings = (newSettings: Settings) => {
-		// Validate before saving
-		if (newSettings.displayName.trim() === "") {
-			throw new Error("Display name cannot be empty!");
-		}
+		if (user) {
+			// Validate before saving
+			if (newSettings.displayName.trim() === "") {
+				throw new Error("Display name cannot be empty!");
+			}
 
-		// Save new username
-		try {
-			db.updateName(newSettings.displayName);
-		} catch {
-			throw new Error("Failed to update display name!");
+			// Save new username
+			try {
+				updateName(newSettings.displayName);
+			} catch {
+				throw new Error("Failed to update display name!");
+			}
 		}
 
 		// Save to localStorage
