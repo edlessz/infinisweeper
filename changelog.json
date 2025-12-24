@@ -1,211 +1,219 @@
 [
-  {
-    "version": "3.0.2",
-    "date": "2025-12-20",
-    "changes": [
-      "Moved backend to Cloud Firestore"
-    ]
-  },
-  {
-    "version": "Hotfix 3.0.1",
-    "date": "2025-06-15",
-    "changes": [
-      "Re-added changelog view",
-      "Re-added ctrl/shift + click to flag",
-      "Re-added favicon",
-      "Re-added readme",
-      "Fixed eslint config",
-      "Fixed sign-in redirect bug"
-    ]
-  },
-  {
-    "version": "3.0",
-    "date": "2025-06-15",
-    "changes": ["Rebuilt in React + TypeScript + Supabase"]
-  },
-  {
-    "version": "2.4",
-    "date": "2023-01-15",
-    "changes": ["Added initial loading screen before first game load"]
-  },
-  {
-    "version": "2.3",
-    "date": "2022-09-05",
-    "changes": [
-      "Camera is no longer restricted when a game is lost",
-      "Added dates to changelog",
-      "Fixed settings menu width bug",
-      "Fixed extra character bug in changelog"
-    ]
-  },
-  {
-    "version": "2.2",
-    "date": "2022-06-08",
-    "changes": [
-      "Added Ding Dang mode",
-      "Added auto-dig around tile",
-      "Fixed bug where extra sounds are played on loss",
-      "Fixed bug where particles don't go away after game ends",
-      "Fixed cache issues"
-    ]
-  },
-  {
-    "version": "2.1",
-    "date": "2022-06-01",
-    "changes": [
-      "Improved loading time",
-      "Added new mobile menu",
-      "Updated high score design",
-      "Global high score will be used instead of local high score when signed in",
-      "Added setting to disable scroll to zoom",
-      "Added setting to disable pinch to zoom",
-      "Fixed bug where particles don't go away",
-      "Fixed infinite board chance",
-      "Fixed bug where some text was blue on iOS 15"
-    ]
-  },
-  {
-    "version": "Hotfix 2.0.4",
-    "date": "2022-05-31",
-    "changes": ["Fixed critical bug where you can't dig on mobile"]
-  },
-  {
-    "version": "2.0.3",
-    "date": "2022-05-26",
-    "changes": [
-      "Fixed bug where dragging with mouse digs tile",
-      "Fixed bug where flags don't appear on continue",
-      "Fixed bug where display of loss screen was off-centered on mobile",
-      "Fixed bug where pinching to zoom on mobile sometimes triggered tile digging",
-      "Fixed bug where border radius of buttons were wrong sometimes"
-    ]
-  },
-  {
-    "version": "2.0.2",
-    "date": "2022-05-25",
-    "changes": [
-      "Reverted flag bonus to previous calculation",
-      "Fixed cache issues"
-    ]
-  },
-  {
-    "version": "Hotfix 2.0.1",
-    "date": "2022-05-24",
-    "changes": [
-      "Fixed images and sounds not loading",
-      "Fixed spelling mistakes"
-    ]
-  },
-  {
-    "version": "2.0",
-    "date": "2022-05-24",
-    "changes": [
-      "Completely new code base",
-      "Massive speed optimization everywhere",
-      "Added markers to show if an incorrect flag is placed",
-      "Added settings menu",
-      "Added animated tile reveals",
-      "Added game timer",
-      "Added auto-save system",
-      "Added pinch to zoom on mobile",
-      "Added new flavor texts",
-      "Added some GUI animations",
-      "Added PWA Support",
-      "Added choose username screen"
-    ]
-  },
-  {
-    "version": "1.4.3",
-    "date": "2022-05-17",
-    "changes": ["Added a loading display screen when continuing a game"]
-  },
-  {
-    "version": "1.4.2",
-    "date": "2022-05-16",
-    "changes": [
-      "Added a mute button",
-      "Fixed bug where first dig doesn't give a reveal on mobile"
-    ]
-  },
-  {
-    "version": "1.4.1",
-    "date": "2022-05-14",
-    "changes": [
-      "Added loading indicator to continue button",
-      "Online functionality loads asynchronously to avoid extra load time",
-      "Fixed bug where only one sound of a type could play at once",
-      "Fixed bug where holding down would select the screen on the Safari browser",
-      "Fixed bug where you can continue a game after you lost - no more cheating Mr. Graf!",
-      "Fixed bug where sometimes high scores won't sort correctly",
-      "Fixed bug where some high score names don't load",
-      "Fixed bug where rush mode goes insane"
-    ]
-  },
-  {
-    "version": "1.4",
-    "date": "2022-05-12",
-    "changes": [
-      "Added global score board",
-      "Added rush mode",
-      "Added loss text",
-      "George's scroll wheel now controls zoom level",
-      "Fixed bug where lose screen would overlap with score data",
-      "Fixed bug where you can still move and dig briefly after you lost"
-    ]
-  },
-  {
-    "version": "1.3.1",
-    "date": "2022-05-09",
-    "changes": [
-      "Zoom level now saves with saved games",
-      "Separated Play Again, Main Menu buttons",
-      "Continue Game no longer starts a new game if there is no game saved",
-      "Bomb explosions now emit particles in full circle radius instead of just the outside",
-      "Fixed bug where removing flag on touchscreen sometimes registers as a dig",
-      "Fixed bug where dragging screen to move was too sensitive",
-      "Fixed bug where zooming does not zoom in to the correct position"
-    ]
-  },
-  {
-    "version": "1.3",
-    "date": "2022-05-06",
-    "changes": [
-      "Now can place flags using shift + click or ctrl + click. Hooray for mac users and orchestra teachers everywhere!",
-      "Added \"How to Play\" section",
-      "Added zoom in/out buttons"
-    ]
-  },
-  {
-    "version": "1.2",
-    "date": "2022-05-05",
-    "changes": ["Added social buttons", "Added play again button"]
-  },
-  {
-    "version": "Hotfix 1.1.1",
-    "date": "2022-05-04",
-    "changes": ["Fixed scrolling slow-down glitch on mobile"]
-  },
-  {
-    "version": "1.1",
-    "date": "2022-05-04",
-    "changes": [
-      "Mobile support",
-      "Sound effects added",
-      "Changelog added",
-      "Bomb & Dialog animations",
-      "Bomb particles slow down reduction",
-      "Fixed bomb particle vanish bug",
-      "Fixed graphical \"white grid\" bug"
-    ]
-  },
-  {
-    "version": "1.0",
-    "date": "2022-05-04",
-    "changes": [
-      "By Ed",
-      "\"Infinisweeper\" and \"You've been sweeped!\" coined by Zhen",
-      "Loss subtitles written by Maeve & Ed",
-      "Default art style effects from Google Minesweeper"
-    ]
-  }
+	{
+		"version": "3.1",
+		"date": "2025-12-24",
+		"changes": [
+			"Re-added PWA support",
+			"Improved game over dialog",
+			"Better settings menu layout",
+			"Other various bug fixes, improvements, and refactors"
+		]
+	},
+	{
+		"version": "3.0.2",
+		"date": "2025-12-20",
+		"changes": ["Moved backend to Cloud Firestore"]
+	},
+	{
+		"version": "Hotfix 3.0.1",
+		"date": "2025-06-15",
+		"changes": [
+			"Re-added changelog view",
+			"Re-added ctrl/shift + click to flag",
+			"Re-added favicon",
+			"Re-added readme",
+			"Fixed eslint config",
+			"Fixed sign-in redirect bug"
+		]
+	},
+	{
+		"version": "3.0",
+		"date": "2025-06-15",
+		"changes": ["Rebuilt in React + TypeScript + Supabase"]
+	},
+	{
+		"version": "2.4",
+		"date": "2023-01-15",
+		"changes": ["Added initial loading screen before first game load"]
+	},
+	{
+		"version": "2.3",
+		"date": "2022-09-05",
+		"changes": [
+			"Camera is no longer restricted when a game is lost",
+			"Added dates to changelog",
+			"Fixed settings menu width bug",
+			"Fixed extra character bug in changelog"
+		]
+	},
+	{
+		"version": "2.2",
+		"date": "2022-06-08",
+		"changes": [
+			"Added Ding Dang mode",
+			"Added auto-dig around tile",
+			"Fixed bug where extra sounds are played on loss",
+			"Fixed bug where particles don't go away after game ends",
+			"Fixed cache issues"
+		]
+	},
+	{
+		"version": "2.1",
+		"date": "2022-06-01",
+		"changes": [
+			"Improved loading time",
+			"Added new mobile menu",
+			"Updated high score design",
+			"Global high score will be used instead of local high score when signed in",
+			"Added setting to disable scroll to zoom",
+			"Added setting to disable pinch to zoom",
+			"Fixed bug where particles don't go away",
+			"Fixed infinite board chance",
+			"Fixed bug where some text was blue on iOS 15"
+		]
+	},
+	{
+		"version": "Hotfix 2.0.4",
+		"date": "2022-05-31",
+		"changes": ["Fixed critical bug where you can't dig on mobile"]
+	},
+	{
+		"version": "2.0.3",
+		"date": "2022-05-26",
+		"changes": [
+			"Fixed bug where dragging with mouse digs tile",
+			"Fixed bug where flags don't appear on continue",
+			"Fixed bug where display of loss screen was off-centered on mobile",
+			"Fixed bug where pinching to zoom on mobile sometimes triggered tile digging",
+			"Fixed bug where border radius of buttons were wrong sometimes"
+		]
+	},
+	{
+		"version": "2.0.2",
+		"date": "2022-05-25",
+		"changes": [
+			"Reverted flag bonus to previous calculation",
+			"Fixed cache issues"
+		]
+	},
+	{
+		"version": "Hotfix 2.0.1",
+		"date": "2022-05-24",
+		"changes": [
+			"Fixed images and sounds not loading",
+			"Fixed spelling mistakes"
+		]
+	},
+	{
+		"version": "2.0",
+		"date": "2022-05-24",
+		"changes": [
+			"Completely new code base",
+			"Massive speed optimization everywhere",
+			"Added markers to show if an incorrect flag is placed",
+			"Added settings menu",
+			"Added animated tile reveals",
+			"Added game timer",
+			"Added auto-save system",
+			"Added pinch to zoom on mobile",
+			"Added new flavor texts",
+			"Added some GUI animations",
+			"Added PWA Support",
+			"Added choose username screen"
+		]
+	},
+	{
+		"version": "1.4.3",
+		"date": "2022-05-17",
+		"changes": ["Added a loading display screen when continuing a game"]
+	},
+	{
+		"version": "1.4.2",
+		"date": "2022-05-16",
+		"changes": [
+			"Added a mute button",
+			"Fixed bug where first dig doesn't give a reveal on mobile"
+		]
+	},
+	{
+		"version": "1.4.1",
+		"date": "2022-05-14",
+		"changes": [
+			"Added loading indicator to continue button",
+			"Online functionality loads asynchronously to avoid extra load time",
+			"Fixed bug where only one sound of a type could play at once",
+			"Fixed bug where holding down would select the screen on the Safari browser",
+			"Fixed bug where you can continue a game after you lost - no more cheating Mr. Graf!",
+			"Fixed bug where sometimes high scores won't sort correctly",
+			"Fixed bug where some high score names don't load",
+			"Fixed bug where rush mode goes insane"
+		]
+	},
+	{
+		"version": "1.4",
+		"date": "2022-05-12",
+		"changes": [
+			"Added global score board",
+			"Added rush mode",
+			"Added loss text",
+			"George's scroll wheel now controls zoom level",
+			"Fixed bug where lose screen would overlap with score data",
+			"Fixed bug where you can still move and dig briefly after you lost"
+		]
+	},
+	{
+		"version": "1.3.1",
+		"date": "2022-05-09",
+		"changes": [
+			"Zoom level now saves with saved games",
+			"Separated Play Again, Main Menu buttons",
+			"Continue Game no longer starts a new game if there is no game saved",
+			"Bomb explosions now emit particles in full circle radius instead of just the outside",
+			"Fixed bug where removing flag on touchscreen sometimes registers as a dig",
+			"Fixed bug where dragging screen to move was too sensitive",
+			"Fixed bug where zooming does not zoom in to the correct position"
+		]
+	},
+	{
+		"version": "1.3",
+		"date": "2022-05-06",
+		"changes": [
+			"Now can place flags using shift + click or ctrl + click. Hooray for mac users and orchestra teachers everywhere!",
+			"Added \"How to Play\" section",
+			"Added zoom in/out buttons"
+		]
+	},
+	{
+		"version": "1.2",
+		"date": "2022-05-05",
+		"changes": ["Added social buttons", "Added play again button"]
+	},
+	{
+		"version": "Hotfix 1.1.1",
+		"date": "2022-05-04",
+		"changes": ["Fixed scrolling slow-down glitch on mobile"]
+	},
+	{
+		"version": "1.1",
+		"date": "2022-05-04",
+		"changes": [
+			"Mobile support",
+			"Sound effects added",
+			"Changelog added",
+			"Bomb & Dialog animations",
+			"Bomb particles slow down reduction",
+			"Fixed bomb particle vanish bug",
+			"Fixed graphical \"white grid\" bug"
+		]
+	},
+	{
+		"version": "1.0",
+		"date": "2022-05-04",
+		"changes": [
+			"By Ed",
+			"\"Infinisweeper\" and \"You've been sweeped!\" coined by Zhen",
+			"Loss subtitles written by Maeve & Ed",
+			"Default art style effects from Google Minesweeper"
+		]
+	}
 ]
