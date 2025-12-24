@@ -1,5 +1,4 @@
 import { useNavigate } from "@tanstack/react-router";
-import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -12,7 +11,6 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useDb } from "@/contexts/DbContext";
-import { db } from "@/lib/firebase";
 import { ButtonList } from "../ButtonList";
 import { AudioManager } from "./AudioManager";
 import type { GameStats } from "./Game";
@@ -30,7 +28,7 @@ export default function SweepedDialog({
 	newGame,
 }: SweepedDialogProps) {
 	const navigate = useNavigate();
-	const { user, name } = useDb();
+	const { user, name, fetchHighScore, submitScore: submitScoreToDb } = useDb();
 	const [scoreSubmitted, setScoreSubmitted] = useState(false);
 	const [highScore, setHighScore] = useState<number | null>(null);
 	const [loadingHighScore, setLoadingHighScore] = useState(false);
@@ -41,27 +39,22 @@ export default function SweepedDialog({
 		setHighScore(null);
 
 		// Fetch the user's high score when dialog opens
-		const fetchHighScore = async () => {
+		const loadHighScore = async () => {
 			if (!user || !dialogVisible) return;
 
 			setLoadingHighScore(true);
 			try {
-				const scoreDocId = `${user.uid}_classic`;
-				const scoreDocRef = doc(db, "scores", scoreDocId);
-				const scoreDoc = await getDoc(scoreDocRef);
-
-				if (scoreDoc.exists()) {
-					setHighScore(scoreDoc.data().score);
-				}
-			} catch (error) {
-				console.error("Error fetching high score:", error);
+				const score = await fetchHighScore("classic");
+				setHighScore(score);
+			} catch {
+				toast.error("Failed to load high score!");
 			} finally {
 				setLoadingHighScore(false);
 			}
 		};
 
-		fetchHighScore();
-	}, [dialogVisible, user]);
+		loadHighScore();
+	}, [dialogVisible, user, fetchHighScore]);
 
 	// Animated counter effect with ease-out and sound
 	useEffect(() => {
@@ -72,7 +65,10 @@ export default function SweepedDialog({
 
 		const duration = 1500; // 1.5 seconds
 		const startTime = Date.now();
-		const totalBlips = Math.min(30, Math.max(5, Math.floor(stats.revealed / 10))); // 5-30 blips based on score
+		const totalBlips = Math.min(
+			30,
+			Math.max(5, Math.floor(stats.revealed / 10)),
+		); // 5-30 blips based on score
 		const blipProgressInterval = 1 / totalBlips;
 		let nextBlipProgress = 0;
 
@@ -115,7 +111,7 @@ export default function SweepedDialog({
 					],
 			)
 			.join("");
-		return `I just scored ${points} points in Infinisweeper! Can you beat me? ${window.location.href}`;
+		return `I just scored ${points} points in Infinisweeper! Can you beat me? ${window.location.origin}`;
 	};
 	const getFacebookShareLink = () =>
 		`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
@@ -140,19 +136,10 @@ export default function SweepedDialog({
 		setScoreSubmitted(true);
 
 		try {
-			const scoreDocId = `${user.uid}_classic`;
-			const scoreDocRef = doc(db, "scores", scoreDocId);
-
-			// Submit the new high score
-			await setDoc(scoreDocRef, {
-				score: stats.revealed,
-				username: name,
-				updatedAt: Timestamp.now(),
-			});
-
+			await submitScoreToDb(stats.revealed, "classic");
 			setScoreSubmitted(true);
 		} catch {
-			toast.error("Failed to submit score.");
+			toast.error("Failed to submit score!");
 			setScoreSubmitted(false);
 		}
 	};

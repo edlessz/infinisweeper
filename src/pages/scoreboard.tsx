@@ -1,13 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import {
-	collection,
-	getDocs,
-	limit,
-	orderBy,
-	query,
-	where,
-} from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { ButtonList } from "@/components/ButtonList";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,17 +11,11 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { useDb } from "@/contexts/DbContext";
-import { db } from "@/lib/firebase";
-
-interface ScoreEntry {
-	name: string;
-	score: number;
-	game_type: string;
-}
+import type { ScoreEntry } from "@/contexts/DbProvider";
 
 const Scoreboard = () => {
 	const navigate = useNavigate();
-	const { name } = useDb();
+	const { name, getScoreboard } = useDb();
 	const [scoreboard, setScoreboard] = useState<Record<
 		string,
 		ScoreEntry[]
@@ -36,37 +23,13 @@ const Scoreboard = () => {
 
 	const refreshScoreboard = useCallback(async () => {
 		try {
-			const modes = [
-				{ id: "classic", label: "Classic" },
-				// { id: "timeAttack", label: "Time Attack" }, // Future mode
-			];
-
-			const scoresByMode: Record<string, ScoreEntry[]> = {};
-
-			await Promise.all(
-				modes.map(async ({ id, label }) => {
-					const q = query(
-						collection(db, "scores"),
-						where("mode", "==", id),
-						orderBy("score", "desc"),
-						limit(10),
-					);
-					const querySnapshot = await getDocs(q);
-
-					scoresByMode[label] = querySnapshot.docs.map((doc) => ({
-						name: doc.data().username,
-						score: doc.data().score,
-						game_type: label,
-					}));
-				}),
-			);
-
+			const scoresByMode = await getScoreboard();
 			setScoreboard(scoresByMode);
-		} catch (error) {
-			console.error("Error fetching scoreboard:", error);
+		} catch {
+			toast.error("There was an error loading the scoreboard!");
 			setScoreboard(null);
 		}
-	}, []);
+	}, [getScoreboard]);
 
 	useEffect(() => {
 		refreshScoreboard();
@@ -94,7 +57,7 @@ const Scoreboard = () => {
 										>
 											<td className="pr-2 text-right">{index + 1}.</td>
 											<td className="pr-4">{score.name}</td>
-											<td>{score.score}</td>
+											<td className="text-right">{score.score}</td>
 										</tr>
 									))}
 								</tbody>

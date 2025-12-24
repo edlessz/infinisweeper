@@ -11,17 +11,26 @@ import {
 	documentId,
 	getDoc,
 	getDocs,
+	limit,
+	orderBy,
 	query,
 	setDoc,
 	Timestamp,
 	where,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { auth, db } from "../lib/firebase";
 import { DbContext } from "./DbContext";
 
 interface DbProviderProps {
 	children: React.ReactNode;
+}
+
+export interface ScoreEntry {
+	name: string;
+	score: number;
+	game_type: string;
 }
 
 export interface DbContextValue {
@@ -30,6 +39,9 @@ export interface DbContextValue {
 	login: () => void;
 	logout: () => void;
 	updateName: (name: string) => void;
+	getScoreboard: () => Promise<Record<string, ScoreEntry[]>>;
+	submitScore: (score: number, mode: string) => Promise<void>;
+	fetchHighScore: (mode: string) => Promise<number | null>;
 }
 
 export const DbProvider = ({ children }: DbProviderProps) => {
@@ -55,8 +67,8 @@ export const DbProvider = ({ children }: DbProviderProps) => {
 						});
 						setName(newUsername);
 					}
-				} catch (error) {
-					console.error("Error fetching/creating user document:", error);
+				} catch {
+					toast.error("Failed to fetch user data!");
 				}
 			} else {
 				setName(null);
@@ -98,6 +110,60 @@ export const DbProvider = ({ children }: DbProviderProps) => {
 			);
 
 			setName(newName);
+		},
+		getScoreboard: async () => {
+			const modes = [
+				{ id: "classic", label: "Classic" },
+				// { id: "timeAttack", label: "Time Attack" }, // Future mode
+			];
+
+			const scoresByMode: Record<string, ScoreEntry[]> = {};
+
+			await Promise.all(
+				modes.map(async ({ id, label }) => {
+					const q = query(
+						collection(db, "scores"),
+						where("mode", "==", id),
+						orderBy("score", "desc"),
+						limit(10),
+					);
+					const querySnapshot = await getDocs(q);
+
+					scoresByMode[label] = querySnapshot.docs.map((doc) => ({
+						name: doc.data().username,
+						score: doc.data().score,
+						game_type: label,
+					}));
+				}),
+			);
+
+			return scoresByMode;
+		},
+		submitScore: async (score: number, mode: string) => {
+			if (!user || !name) return;
+
+			const scoreDocId = `${user.uid}_${mode}`;
+			const scoreDocRef = doc(db, "scores", scoreDocId);
+
+			await setDoc(scoreDocRef, {
+				score,
+				username: name,
+				mode,
+				updatedAt: Timestamp.now(),
+			});
+		},
+		fetchHighScore: async (mode: string) => {
+			if (!user) return null;
+
+			const scoreDocId = `${user.uid}_${mode}`;
+			const scoreDocRef = doc(db, "scores", scoreDocId);
+			const scoreDoc = await getDoc(scoreDocRef);
+
+			if (scoreDoc.exists()) {
+				return scoreDoc.data().score;
+			}
+
+			return null;
 		},
 	};
 
