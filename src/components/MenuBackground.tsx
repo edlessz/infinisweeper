@@ -1,7 +1,7 @@
 import { makeNoise2D } from "fast-simplex-noise";
 import { useEffect, useRef } from "react";
-import { ImageManager } from "@/components/Game/ImageManager";
 import { useSettings } from "@/contexts/SettingsContext";
+import { ImageManager } from "@/engine/ImageManager";
 
 export default function MenuBackground() {
 	const { settings } = useSettings();

@@ -11,9 +11,9 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useDb } from "@/contexts/DbContext";
+import { AudioManager } from "../../engine/AudioManager";
+import type { GameStats } from "../../engine/Game";
 import { ButtonList } from "../ButtonList";
-import { AudioManager } from "./AudioManager";
-import type { GameStats } from "./Game";
 
 interface SweepedDialogProps {
 	dialogVisible: boolean;

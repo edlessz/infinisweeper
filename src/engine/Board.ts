@@ -149,7 +149,7 @@ export default class Board {
 	public update(): void {
 		this.processRevealQueue();
 
-		if (this.game.hooks?.getSettings().disableParticles)
+		if (this.game.settings?.disableParticles)
 			this.particleManager.clear();
 		else this.particleManager.update();
 	}
@@ -201,7 +201,7 @@ export default class Board {
 						}
 
 						// draw borders
-						if (this.game.hooks?.getSettings().disableBorders) break;
+						if (this.game.settings?.disableBorders) break;
 						ctx.fillStyle = "#86AE3A";
 
 						const revealedNeighbors = {

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSettings } from "@/contexts/SettingsContext";
-import type Game from "./Game";
-import type { GameStats } from "./Game";
+import type Game from "../../engine/Game";
+import type { GameStats } from "../../engine/Game";
 import Menubar from "./Menubar";
 import SweepedDialog from "./SweepedDialog";
 
@@ -48,20 +48,18 @@ export default function Viewport({ game, newGame }: ViewportProps) {
 		const viewport = canvas?.parentElement ?? null;
 
 		game.canvas = canvas;
+		game.settings = settings; // Inject settings directly
 		game.addEventListeners();
 		game.setHooks({
-			getGameActive: () => gameActiveRef.current,
-			setGameActive,
-			getStats: () => statsRef.current,
 			setStats,
-			getSettings: () => settings,
-			getDialogVisible: () => dialogVisibleRef.current,
-			setDialogVisible,
-			randomizeSubtext: () => {
-				if (subtexts.length > 0) {
+			setGameActive: (active: boolean) => {
+				setGameActive(active);
+				// When game becomes inactive, randomize subtext (UI concern)
+				if (!active && subtexts.length > 0) {
 					setSubtext(subtexts[Math.floor(Math.random() * subtexts.length)]);
 				}
 			},
+			setDialogVisible,
 		});
 
 		setDialogVisible(false);

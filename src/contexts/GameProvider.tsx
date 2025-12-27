@@ -1,8 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
-import { AudioManager } from "@/components/Game/AudioManager";
-import Game, { type SaveData } from "@/components/Game/Game";
-import { ImageManager } from "@/components/Game/ImageManager";
+import { AudioManager } from "@/engine/AudioManager";
+import Game, { type SaveData } from "@/engine/Game";
+import { ImageManager } from "@/engine/ImageManager";
 import { GameContext } from "./GameContext";
 
 interface GameProviderProps {

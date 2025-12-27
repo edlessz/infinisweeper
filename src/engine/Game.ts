@@ -1,5 +1,5 @@
 import type { Vector2 } from "@/lib/utils";
-import type { Settings } from "../../contexts/SettingsProvider";
+import type { Settings } from "../contexts/SettingsProvider";
 import Board from "./Board";
 import Camera from "./Camera";
 
@@ -18,27 +18,28 @@ export interface GameStats {
 }
 
 interface GameHooks {
-	getStats: () => GameStats;
 	setStats: (stats: GameStats) => void;
-	getGameActive: () => boolean;
 	setGameActive: (active: boolean) => void;
-	getDialogVisible: () => boolean;
 	setDialogVisible: (visible: boolean) => void;
-	getSettings: () => Settings;
-	randomizeSubtext: () => void;
 }
 
 export default class Game {
 	public Board: Board;
 	public camera: Camera;
 	public canvas: HTMLCanvasElement | null = null;
+	public settings: Settings | null = null;
 	public readonly size: Vector2 = {
 		x: 0,
 		y: 0,
 	};
 	public gameStarted = false;
+	private _gameActive = true;
 
 	public static savedGameKey = "infinisweeper.saved-game";
+
+	public get gameActive(): boolean {
+		return this._gameActive;
+	}
 
 	public updateSize(): void {
 		if (!this.canvas) return;
@@ -61,7 +62,7 @@ export default class Game {
 		void deltaTime;
 		this.Board.update();
 
-		if (!this.hooks?.getSettings().disableCameraShake) {
+		if (this.settings && !this.settings.disableCameraShake) {
 			const revealQueueLength = this.Board.getRevealQueueLength();
 			if (revealQueueLength > 10)
 				this.camera.shake(this.Board.getRevealQueueLength() * 0.01);
@@ -142,7 +143,7 @@ export default class Game {
 		hold?: boolean,
 	): void => {
 		event.preventDefault();
-		if (!this.hooks?.getGameActive()) return;
+		if (!this.gameActive) return;
 
 		const screenSpace: Vector2 = {
 			x:
@@ -267,10 +268,10 @@ export default class Game {
 	}
 
 	public loseGame(): void {
-		this.hooks?.setGameActive(false);
+		this._gameActive = false;
+		this.hooks?.setGameActive(false); // Notify React
 		localStorage.removeItem(Game.savedGameKey);
 		this.Board.showIncorrectFlags();
-		this.hooks?.randomizeSubtext();
 		setTimeout(() => {
 			this.hooks?.setDialogVisible(true);
 		}, 2500);

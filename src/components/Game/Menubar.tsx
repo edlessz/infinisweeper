@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Home, SaveIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import Game, { type GameStats } from "./Game";
+import Game, { type GameStats } from "../../engine/Game";
 
 interface MenubarProps {
 	game: Game;
