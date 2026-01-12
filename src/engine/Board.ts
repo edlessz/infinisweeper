@@ -149,8 +149,7 @@ export default class Board {
 	public update(): void {
 		this.processRevealQueue();
 
-		if (this.game.settings?.disableParticles)
-			this.particleManager.clear();
+		if (this.game.settings?.disableParticles) this.particleManager.clear();
 		else this.particleManager.update();
 	}
 
