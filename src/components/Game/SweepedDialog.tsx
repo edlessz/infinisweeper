@@ -21,12 +21,12 @@ interface SweepedDialogProps {
 	stats: GameStats;
 	newGame: (() => void) | null;
 }
-export default function SweepedDialog({
+export const SweepedDialog = ({
 	dialogVisible,
 	subtext,
 	stats,
 	newGame,
-}: SweepedDialogProps) {
+}: SweepedDialogProps) => {
 	const navigate = useNavigate();
 	const { user, name, fetchHighScore, submitScore: submitScoreToDb } = useDb();
 	const [scoreSubmitted, setScoreSubmitted] = useState(false);
@@ -229,4 +229,4 @@ export default function SweepedDialog({
 			</DialogContent>
 		</Dialog>
 	);
-}
+};

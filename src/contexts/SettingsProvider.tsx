@@ -3,54 +3,67 @@ import { useState } from "react";
 import { useDb } from "./DbContext";
 import { SettingsContext } from "./SettingsContext";
 
-interface SettingMetadata {
+interface SettingMetadata<T = unknown> {
 	name: string;
-	type: "boolean" | "string";
-	default: boolean | string;
+	type: "boolean" | "string" | "select";
+	default: T;
 	description: string;
+	options?: { value: T; label: string }[];
 }
 
-type SettingValueMap = {
-	boolean: boolean;
-	string: string;
-};
+type InferSettingValue<T> = T extends SettingMetadata<infer V> ? V : never;
 
 const SettingsMetadata = {
 	displayName: {
 		name: "Display Name",
 		description: "Your name on the scoreboard.",
-		type: "string",
+		type: "string" as const,
 		default: "",
 	},
 	classicBackground: {
 		name: "Classic Background",
 		description: "Enable the classic infinisweeper background style.",
-		type: "boolean",
+		type: "boolean" as const,
 		default: false,
 	},
 	disableBorders: {
 		name: "Disable Borders",
 		description: "Disables borders around shown tiles.",
-		type: "boolean",
+		type: "boolean" as const,
 		default: false,
 	},
 	disableParticles: {
 		name: "Disable Particles",
 		description: "Disables particle effects and falling tiles.",
-		type: "boolean",
+		type: "boolean" as const,
 		default: false,
 	},
 	disableCameraShake: {
 		name: "Disable Camera Shake",
 		description:
 			"Disable the camera shake effect when large amounts of tiles are revealed.",
-		type: "boolean",
+		type: "boolean" as const,
 		default: false,
 	},
-} as const satisfies Record<string, SettingMetadata>;
+	autosaveInterval: {
+		name: "Autosave Interval",
+		description: "Automatically save game progress at regular intervals.",
+		type: "select" as const,
+		default: "60",
+		options: [
+			{ value: "0", label: "Disabled" },
+			{ value: "30", label: "Every 30 seconds" },
+			{ value: "60", label: "Every 1 minute" },
+			{ value: "120", label: "Every 2 minutes" },
+			{ value: "300", label: "Every 5 minutes" },
+		],
+	},
+} satisfies Record<string, SettingMetadata>;
 
 export type Settings = {
-	[K in keyof typeof SettingsMetadata]: SettingValueMap[(typeof SettingsMetadata)[K]["type"]];
+	[K in keyof typeof SettingsMetadata]: InferSettingValue<
+		(typeof SettingsMetadata)[K]
+	>;
 };
 
 export interface SettingsContextValue {

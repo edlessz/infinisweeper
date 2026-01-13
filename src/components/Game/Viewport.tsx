@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useSettings } from "@/contexts/SettingsContext";
-import type Game from "../../engine/Game";
 import type { GameStats } from "../../engine/Game";
-import Menubar from "./Menubar";
-import SweepedDialog from "./SweepedDialog";
+import Game from "../../engine/Game";
+import { Menubar, type MenubarRef } from "./Menubar";
+import { SweepedDialog } from "./SweepedDialog";
 
 interface ViewportProps {
 	game: Game;
 	newGame: (() => void) | null;
 }
 
-export default function Viewport({ game, newGame }: ViewportProps) {
+export const Viewport = ({ game, newGame }: ViewportProps) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const menubarRef = useRef<MenubarRef>(null);
 	const [subtext, setSubtext] = useState("");
 	const [subtexts, setSubtexts] = useState<string[]>([]);
 	const { settings } = useSettings();
@@ -111,10 +112,50 @@ export default function Viewport({ game, newGame }: ViewportProps) {
 		};
 	}, [game, settings, subtexts]);
 
+	// Autosave interval logic
+	useEffect(() => {
+		const intervalSeconds = parseInt(settings.autosaveInterval || "0", 10);
+		if (intervalSeconds === 0) return; // Autosave disabled
+
+		const intervalId = setInterval(() => {
+			// Guards: only save if game is active and started
+			if (!game.gameActive || !game.gameStarted) return;
+
+			const saveData = game.getSaveData();
+			if (saveData) {
+				localStorage.setItem(Game.savedGameKey, JSON.stringify(saveData));
+				// Show visual indicator
+				menubarRef.current?.showAutosaveIndicator();
+			}
+		}, intervalSeconds * 1000);
+
+		return () => clearInterval(intervalId);
+	}, [game, settings.autosaveInterval]);
+
+	// Emergency save on page close
+	useEffect(() => {
+		const handleBeforeUnload = () => {
+			if (game?.gameActive && game?.gameStarted) {
+				const saveData = game.getSaveData();
+				if (saveData) {
+					localStorage.setItem(Game.savedGameKey, JSON.stringify(saveData));
+				}
+			}
+		};
+
+		window.addEventListener("beforeunload", handleBeforeUnload);
+		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+	}, [game]);
+
 	return (
 		<div className="w-full h-full relative overflow-hidden">
 			<canvas ref={canvasRef} className="absolute inset-0 touch-none" />
-			<Menubar gameActive={gameActive} game={game} stats={stats} />
+			<Menubar
+				ref={menubarRef}
+				gameActive={gameActive}
+				game={game}
+				stats={stats}
+			/>
 			<SweepedDialog
 				dialogVisible={dialogVisible}
 				subtext={subtext}
@@ -123,4 +164,4 @@ export default function Viewport({ game, newGame }: ViewportProps) {
 			/>
 		</div>
 	);
-}
+};

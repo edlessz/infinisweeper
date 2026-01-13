@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
-import Viewport from "@/components/game/Viewport";
+import { Viewport } from "@/components/game/Viewport";
 import { useGame } from "@/contexts/GameContext";
 
 const Game = () => {

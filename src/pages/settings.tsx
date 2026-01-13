@@ -1,3 +1,4 @@
+import { Select } from "@radix-ui/react-select";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -13,6 +14,12 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { useDb } from "@/contexts/DbContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { typedEntries } from "@/lib/utils";
@@ -101,7 +108,7 @@ const Settings = () => {
 									</div>
 								</Label>
 							);
-						default:
+						case "select":
 							return (
 								<Label
 									key={key}
@@ -115,18 +122,30 @@ const Settings = () => {
 											{meta.description}
 										</p>
 									</div>
-									<Input
-										type="text"
-										value={tempSettings[key] as boolean | string as string}
-										onChange={(e) =>
+									<Select
+										value={tempSettings[key] as string}
+										onValueChange={(value) =>
 											setTempSettings({
 												...tempSettings,
-												[key]: e.target.value,
+												[key]: value,
 											})
 										}
-									/>
+									>
+										<SelectTrigger className="w-full">
+											<SelectValue placeholder="Select an option" />
+										</SelectTrigger>
+										<SelectContent>
+											{meta.options?.map((opt) => (
+												<SelectItem key={opt.value} value={opt.value}>
+													{opt.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
 								</Label>
 							);
+						default:
+							return null;
 					}
 				})}
 			</CardContent>
